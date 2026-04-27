@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+
+import mariePhoto from "./assets/images/marie.jpg";
+import logo from "./assets/images/logo.png";
+
 
 const C = {
     ink: "#0d0b1a",
@@ -12,32 +17,85 @@ const C = {
 };
 
 const illus = [
-    { bg: "linear-gradient(135deg,#1a1035,#4f4790)", emoji: "🌙", label: "Nuit Féerique", sub: "Aquarelle numérique" },
-    { bg: "linear-gradient(135deg,#1a3035,#2a7090)", emoji: "🌿", label: "Botanique", sub: "Encre & couleurs" },
-    { bg: "linear-gradient(135deg,#35101a,#903050)", emoji: "🌸", label: "Flore Sauvage", sub: "Illustration éditoriale" },
-    { bg: "linear-gradient(135deg,#102535,#1a5060)", emoji: "🦋", label: "Métamorphose", sub: "Série limitée" },
-    { bg: "linear-gradient(135deg,#251035,#6a3080)", emoji: "✨", label: "Cosmos", sub: "Print numérique" },
+    { bg: "linear-gradient(135deg,#1a1035,#4f4790)", img: "/illu_1.png", label: "La Louve" },
+    { bg: "linear-gradient(135deg,#1a3035,#2a7090)", img: "/illu_2.png", label: "Pomme de Terre" },
+    { bg: "linear-gradient(135deg,#35101a,#903050)", img: "/illu_3.png", label: "Petite fille aux Fleurs" },
+    { bg: "linear-gradient(135deg,#102535,#1a5060)", img: "/illu_4.png", label: "La rencontre" },
+    { bg: "linear-gradient(135deg,#251035,#6a3080)", img: "/illu_5.png", label: "L'automne" },
 ];
 
 const croch = [
-    { bg: "linear-gradient(135deg,#1e1206,#5c3d12)", emoji: "🐻", label: "Ours Arctique", sub: "Laine mérinos" },
-    { bg: "linear-gradient(135deg,#06121e,#124060)", emoji: "🐙", label: "Pieuvre Abyssale", sub: "Coton organique" },
-    { bg: "linear-gradient(135deg,#121e06,#3a5c12)", emoji: "🌵", label: "Jardin Calme", sub: "Décoration murale" },
-    { bg: "linear-gradient(135deg,#1e0612,#5c1230)", emoji: "🐰", label: "Lapin Lune", sub: "Sur commande" },
-    { bg: "linear-gradient(135deg,#1a1206,#5c4a12)", emoji: "🌻", label: "Soleil d'Or", sub: "Édition unique" },
+    { bg: "linear-gradient(135deg,#1e1206,#5c3d12)", img: "/croch.png", label: "Les cocottes" },
+    { bg: "linear-gradient(135deg,#06121e,#124060)", img: "/croch5.png", label: "Dinosaures" },
+    { bg: "linear-gradient(135deg,#121e06,#3a5c12)", img: "/croch2.png", label: "Le renard" },
+    { bg: "linear-gradient(135deg,#1e0612,#5c1230)", img: "/croch3.png", label: "Pinguins" },
+    { bg: "linear-gradient(135deg,#1a1206,#5c4a12)", img: "/croch4.png", label: "Les Cactus" },
 ];
 
-import mariePhoto from "./assets/images/marie.jpg";
+const scrollAnimStyle = `
+  @keyframes scrollFloat {
+    0% { transform: translateY(0); opacity: 0.3; }
+    50% { transform: translateY(10px); opacity: 1; }
+    100% { transform: translateY(0); opacity: 0.3; }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; transition: all 0.8s ease-out; }
+  .reveal.visible { animation: fadeInUp 1s forwards ease-out; }
+`;
+
+// --- COMPOSANT COMPTEUR ANIMÉ ---
+function AnimatedCounter({ target, duration = 2000 }) {
+    const [count, setCount] = useState(0);
+    const countRef = useRef(null);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) setIsVisible(true);
+        }, { threshold: 0.5 });
+        if (countRef.current) observer.observe(countRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!isVisible) return;
+        let start = 0;
+        const targetValue = parseInt(target);
+        const increment = targetValue / (duration / 16);
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= targetValue) {
+                setCount(targetValue);
+                clearInterval(timer);
+            } else {
+                setCount(Math.floor(start));
+            }
+        }, 16);
+        return () => clearInterval(timer);
+    }, [isVisible, target, duration]);
+
+    return <span ref={countRef}>{count}{target.includes('+') ? '+' : ''}</span>;
+}
 
 function Carousel({ items, dark }) {
     const [cur, setCur] = useState(0);
     const n = items.length;
+
+    // --- AUTOPLAY ---
+    useEffect(() => {
+        const timer = setInterval(() => setCur(c => (c + 1) % n), 4000);
+        return () => clearInterval(timer);
+    }, [n]);
+
     const prev = () => setCur(i => (i - 1 + n) % n);
     const next = () => setCur(i => (i + 1) % n);
 
     return (
         <div style={{ width: "100%", userSelect: "none" }}>
-            <div style={{ position: "relative", height: 320, overflow: "hidden", borderRadius: 24 }}>
+            <div style={{ position: "relative", height: 500, overflow: "hidden", borderRadius: 24 }}>
                 {items.map((item, i) => {
                     const offset = ((i - cur + n) % n);
                     const pos = offset <= n / 2 ? offset : offset - n;
@@ -54,7 +112,18 @@ function Carousel({ items, dark }) {
                             zIndex: pos === 0 ? 2 : 1,
                             border: "1px solid rgba(255,255,255,0.08)",
                         }}>
-                            <div style={{ fontSize: 64, marginBottom: 16 }}>{item.emoji}</div>
+                            <div style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}>
+                                <img
+                                    src={item.img}
+                                    alt={item.label}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover", // L'image remplit tout l'espace
+                                        opacity: 0.6, // Optionnel : pour mieux voir le texte par-dessus
+                                    }}
+                                />
+                            </div>
                             <div style={{ color: "#fff", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 400 }}>{item.label}</div>
                             <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, letterSpacing: 2, marginTop: 6, textTransform: "uppercase" }}>{item.sub}</div>
                         </div>
@@ -106,6 +175,17 @@ export default function App() {
     const [modal, setModal] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
+    // --- GESTION DU REVEAL AU SCROLL ---
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         const h = () => setScrolled(window.scrollY > 40);
         window.addEventListener("scroll", h);
@@ -138,66 +218,28 @@ export default function App() {
         </button>
     );
 
+    const ScrollIndicator = ({ dark }) => (
+        <div style={{ position: "absolute", bottom: "30px", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", zIndex: 10, opacity: 0.6, animation: "scrollFloat 2s infinite ease-in-out" }}>
+            <style>{scrollAnimStyle}</style>
+            <span style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", fontWeight: 600, color: dark ? "#fff" : "#0d0b1a" }}>Scroll</span>
+            <div style={{ width: "1px", height: "40px", background: `linear-gradient(to bottom, ${dark ? "#fff" : "#0d0b1a"}, transparent)` }} />
+        </div>
+    );
+
     return (
-        <div style={{
-            background: bg,
-            color: txt,
-            fontFamily: "Corbel, sans-serif",
-            minHeight: "100vh",
-            transition: "all .5s",
-            position: "relative", // C'est le point de repère pour les bulles
-            overflowX: "hidden"
-        }}>
+        <div style={{ background: bg, color: txt, fontFamily: "Corbel, sans-serif", minHeight: "100vh", transition: "all .5s", position: "relative", overflowX: "hidden" }}>
 
-            {/* --- LES BULLES (Elles restent en haut et scrollent avec le texte) --- */}
-            <div style={{
-                position: "absolute", // Absolute = elles suivent le mouvement du scroll
-                top: "-100px",
-                left: "-15%",
-                width: "80vw",
-                height: "80vw",
-                borderRadius: "50%",
-                background: dark
-                    ? "radial-gradient(circle, rgba(79,71,144,0.25) 0%, transparent 75%)"
-                    : `radial-gradient(circle, ${C.sky} 0%, transparent 70%)`,
-                filter: "blur(90px)",
-                opacity: dark ? 0.8 : 0.7,
-                pointerEvents: "none",
-                zIndex: 0
-            }} />
-
-            <div style={{
-                position: "absolute", // Absolute = elles suivent le mouvement du scroll
-                top: "10%",
-                right: "-10%",
-                width: "60vw",
-                height: "60vw",
-                borderRadius: "50%",
-                background: dark
-                    ? "radial-gradient(circle, rgba(253,106,61,0.15) 0%, transparent 75%)"
-                    : `radial-gradient(circle, ${C.accent} 0%, transparent 70%)`,
-                filter: "blur(110px)",
-                opacity: dark ? 0.8 : 0.5,
-                pointerEvents: "none",
-                zIndex: 0
-            }} />
+            {/* --- LES BULLES D'AMBIANCE --- */}
+            <div style={{ position: "absolute", top: "-100px", left: "-15%", width: "80vw", height: "80vw", borderRadius: "50%", background: dark ? "radial-gradient(circle, rgba(79,71,144,0.25) 0%, transparent 75%)" : `radial-gradient(circle, ${C.sky} 0%, transparent 70%)`, filter: "blur(90px)", opacity: dark ? 0.8 : 0.7, pointerEvents: "none", zIndex: 0 }} />
+            <div style={{ position: "absolute", top: "10%", right: "-10%", width: "60vw", height: "60vw", borderRadius: "50%", background: dark ? "radial-gradient(circle, rgba(253,106,61,0.15) 0%, transparent 75%)" : `radial-gradient(circle, ${C.accent} 0%, transparent 70%)`, filter: "blur(110px)", opacity: dark ? 0.8 : 0.5, pointerEvents: "none", zIndex: 0 }} />
 
             {/* NAV */}
-            <nav style={{
-                position: "fixed", // On passe de sticky à fixed
-                top: 0,
-                left: 0, // Indispensable avec fixed
-                right: 0, // Indispensable avec fixed
-                zIndex: 100,
-                background: dark
-                    ? scrolled ? "rgba(13, 11, 26, 0.51)" : "transparent"
-                    : scrolled ? "rgba(250, 248, 244, 0.51)" : "transparent",
-                backdropFilter: scrolled ? "blur(50px)" : "none",
-                borderBottom: scrolled ? `1px solid ${divider}` : "1px solid transparent",
-                transition: "all .2s",
-            }}>
-                <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 40px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontFamily: "Georgia,serif", fontSize: 20, letterSpacing: 1.5, color: txt }}>Coroller Illustration & crochet</span>
+            <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: dark ? scrolled ? "rgba(13, 11, 26, 0.51)" : "transparent" : scrolled ? "rgba(250, 248, 244, 0.51)" : "transparent", backdropFilter: scrolled ? "blur(50px)" : "none", borderBottom: scrolled ? `1px solid ${divider}` : "1px solid transparent", transition: "all .2s" }}>
+                <div style={{ maxWidth: 1600, margin: "0 auto", padding: "0 40px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <img src={logo} alt="Logo" style={{ height: 40, width: "auto", objectFit: "contain" }} />
+                        <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>Coroller Illustration & Crochet</span>
+                    </div>
                     <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
                         {["À propos", "Illustrations", "Crochet", "Contact"].map(l => (
                             <a key={l} href={`#${l.replace("À", "a").replace(" ", "-").toLowerCase()}`}
@@ -205,53 +247,25 @@ export default function App() {
                                 onMouseEnter={e => e.target.style.color = txt}
                                 onMouseLeave={e => e.target.style.color = muted}>{l}</a>
                         ))}
-                        <button onClick={() => setDark(d => !d)} style={{
-                            background: cardBg, border: `1px solid ${cardBorder}`,
-                            borderRadius: 99, width: 40, height: 24, cursor: "pointer",
-                            display: "flex", alignItems: "center", padding: "0 4px",
-                            position: "relative", transition: "background .3s",
-                        }}>
-                            <div style={{
-                                width: 16, height: 16, borderRadius: "50%",
-                                background: dark ? C.sky : C.accent,
-                                transform: dark ? "translateX(16px)" : "translateX(0)",
-                                transition: "all .3s",
-                            }} />
+                        <button onClick={() => setDark(d => !d)} style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 99, width: 40, height: 24, cursor: "pointer", display: "flex", alignItems: "center", padding: "0 4px", position: "relative", transition: "background .3s" }}>
+                            <div style={{ width: 16, height: 16, borderRadius: "50%", background: dark ? C.sky : C.accent, transform: dark ? "translateX(16px)" : "translateX(0)", transition: "all .3s" }} />
                         </button>
                     </div>
                 </div>
             </nav>
 
             {/* HERO */}
-            <section style={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                padding: "80px 40px",
-                position: "relative",
-                maxWidth: 1100,
-                margin: "0 auto",
-                zIndex: 1,
-            }}>
-
-                {/* CONTENU TEXTE */}
+            <section style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", maxWidth: "100%", margin: "0 auto", zIndex: 1, overflow: "hidden" }}>
+                <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.2, pointerEvents: "none" }}>
+                    <iframe src="https://my.spline.design/maskimagerevealcopycopy-tjKszRnI28NNBDPRI65AaOth-eLk/" frameBorder="0" width="100%" height="120%" style={{ transform: "scale(1.1)", filter: dark ? "brightness(0.8) contrast(1.2)" : "none" }}></iframe>
+                </div>
                 <div style={{ position: "relative", zIndex: 1, maxWidth: 780 }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 32, padding: "8px 20px", borderRadius: 99, border: `1px solid ${cardBorder}`, background: cardBg }}>
                         <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent }} />
-                        <span style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: muted, fontWeight: 600 }}>Illustration · Crochet</span>
+                        <Tag label="Illustration · Crochet" />
                     </div>
-                    <h1 style={{
-                        fontFamily: "Georgia,serif",
-                        fontSize: "clamp(3.5rem,8vw,7rem)",
-                        fontWeight: 400, lineHeight: 1.0,
-                        margin: "0 0 28px", letterSpacing: -1,
-                        color: txt,
-                    }}>
-                        L'art à l'état<br />
-                        <span style={{ color: C.accent }}>pur.</span>
+                    <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(3.5rem,8vw,7rem)", fontWeight: 400, lineHeight: 1.0, margin: "0 0 28px", letterSpacing: -1, color: txt, textShadow: dark ? "0 10px 30px rgba(0,0,0,0.5)" : "none" }}>
+                        L'art à l'état<br /><span style={{ color: C.accent }}>pur.</span>
                     </h1>
                     <p style={{ fontSize: "clamp(1rem,2vw,1.2rem)", color: muted, maxWidth: 480, margin: "0 auto 44px", lineHeight: 1.8, fontWeight: 400 }}>
                         Illustrations oniriques et pièces crochet uniques — chaque création naît d'une intention, d'un fragment de rêve mis en forme.
@@ -261,33 +275,19 @@ export default function App() {
                         <CTABtn outline>Voir les créations</CTABtn>
                     </div>
                 </div>
+                <ScrollIndicator dark={dark} />
             </section>
 
             {/* À PROPOS */}
-            <section id="a-propos" style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
-                <div style={{ position: "relative" }}>
-
-                    {/* --- MODIFICATION ICI : On remplace l'émoji par la photo --- */}
-                    <div style={{
-                        aspectRatio: "4/5",
-                        borderRadius: 24,
-                        // On enlève le fond dégradé, on garde juste une couleur neutre
-                        background: dark ? "#1a1840" : "#d5e4f9",
-                        overflow: "hidden",
-                        border: `1px solid ${cardBorder}`
-                    }}>
-                        <img
-                            src={mariePhoto} // On utilise la variable d'import
-                            alt="Portrait de Marie Léonard"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover", // Important pour que l'image remplisse le cadre sans se déformer
-                            }}
-                        />
+            <section id="a-propos" className="reveal" style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+                <div style={{ position: "relative", justifySelf: "center", width: "100%", maxWidth: "500px" }}>
+                    <div style={{ aspectRatio: "4/5", borderRadius: 24, background: dark ? "#1a1840" : "#d5e4f9", overflow: "hidden", border: `1px solid ${cardBorder}` }}>
+                        <img src={mariePhoto} alt="Portrait" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     </div>
                     <div style={{ position: "absolute", bottom: 28, right: -20, background: dark ? "#12102a" : "#bbd3f5f3", border: `1px solid ${cardBorder}`, borderRadius: 16, padding: "16px 20px" }}>
-                        <div style={{ fontSize: 24, fontFamily: "Georgia,serif", color: txt, fontWeight: 400 }}>8+</div>
+                        <div style={{ fontSize: 24, fontFamily: "Georgia,serif", color: txt, fontWeight: 400 }}>
+                            <AnimatedCounter target="8+" />
+                        </div>
                         <div style={{ fontSize: 11, color: muted, letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }}>ans d'expérience</div>
                     </div>
                 </div>
@@ -305,7 +305,9 @@ export default function App() {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
                         {[["150+", "Illustrations"], ["80+", "Pièces crochet"], ["40+", "Clients satisfaits"]].map(([n, l]) => (
                             <div key={l} style={{ padding: "18px 16px", borderRadius: 14, border: `1px solid ${cardBorder}`, background: cardBg, textAlign: "center" }}>
-                                <div style={{ fontFamily: "Georgia,serif", fontSize: 26, color: txt }}>{n}</div>
+                                <div style={{ fontFamily: "Georgia,serif", fontSize: 26, color: txt }}>
+                                    <AnimatedCounter target={n} />
+                                </div>
                                 <div style={{ fontSize: 11, color: muted, marginTop: 4, letterSpacing: 0.5 }}>{l}</div>
                             </div>
                         ))}
@@ -314,8 +316,8 @@ export default function App() {
             </section>
 
             {/* ILLUSTRATIONS */}
-            <section id="illustrations" style={{ borderTop: `1px solid ${divider}` }}>
-                <div style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+            <section id="illustrations" className="reveal" style={{ borderTop: `1px solid ${divider}` }}>
+                <div style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
                     <Carousel items={illus} dark={dark} />
                     <div>
                         <Tag label="Illustrations" />
@@ -337,8 +339,8 @@ export default function App() {
             </section>
 
             {/* CROCHET */}
-            <section id="crochet" style={{ borderTop: `1px solid ${divider}` }}>
-                <div style={{ maxWidth: 1100, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+            <section id="crochet" className="reveal" style={{ borderTop: `1px solid ${divider}` }}>
+                <div style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
                     <div>
                         <Tag label="Créations crochet" />
                         <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, margin: "16px 0 24px", lineHeight: 1.15, color: txt }}>
@@ -359,10 +361,10 @@ export default function App() {
                 </div>
             </section>
 
-            {/* CTA */}
-            <section id="contact" style={{ padding: "0 40px 100px" }}>
+            {/* CTA RESTAURÉ */}
+            <section id="contact" className="reveal" style={{ padding: "0 40px 100px" }}>
                 <div style={{
-                    maxWidth: 1100, margin: "0 auto",
+                    maxWidth: 1600, margin: "0 auto",
                     background: dark ? "linear-gradient(135deg,#1a1640 0%,#2a204a 50%,#1a1030 100%)" : "linear-gradient(135deg,#eae6f8 0%,#ddd8f5 50%,#e8e2f5 100%)",
                     borderRadius: 28, padding: "80px 64px",
                     border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(79,71,144,0.12)"}`,
@@ -384,18 +386,93 @@ export default function App() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer style={{ borderTop: `1px solid ${divider}`, padding: "40px 40px" }}>
-                <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
-                    <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>Marie Léonard</span>
-                    <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
-                        {["Instagram", "Pinterest", "Etsy", "Behance"].map(s => (
-                            <a key={s} href="#" style={{ color: muted, fontSize: 13, textDecoration: "none", transition: "color .2s", letterSpacing: 0.3, fontWeight: 600 }}
-                                onMouseEnter={e => e.target.style.color = txt}
-                                onMouseLeave={e => e.target.style.color = muted}>{s}</a>
-                        ))}
+            {/* FOOTER RESTAURÉ ET MIS À JOUR */}
+            <footer style={{ borderTop: `1px solid ${divider}`, padding: "60px 40px" }}>
+                <div style={{ maxWidth: 1600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 40 }}>
+
+                    {/* IDENTITÉ */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>
+                            Coroller Illustration & Crochet
+                        </span>
+                        <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi</span>
                     </div>
-                    <span style={{ color: muted, fontSize: 12 }}>© 2025 · Tous droits réservés</span>
+
+                    {/* RÉSEAUX & CONTACT AVEC VRAIS LOGOS STYLÉS */}
+                    <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
+
+                        {/* Instagram */}
+                        <a href="https://www.instagram.com/m.coroller/" target="_blank" rel="noreferrer"
+                            style={{
+                                color: muted,
+                                textDecoration: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                transition: "all .3s ease",
+                                fontSize: "14px"
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.color = txt;
+                                e.currentTarget.style.transform = "translateY(-2px)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.color = muted;
+                                e.currentTarget.style.transform = "translateY(0)";
+                            }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
+                            <span>Instagram</span>
+                        </a>
+
+                        {/* Email / Contact */}
+                        <a href="mailto:tonemail@exemple.com"
+                            style={{
+                                color: muted,
+                                textDecoration: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                transition: "all .3s ease",
+                                fontSize: "14px"
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.color = txt;
+                                e.currentTarget.style.transform = "translateY(-2px)";
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.color = muted;
+                                e.currentTarget.style.transform = "translateY(0)";
+                            }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <span>Contact</span>
+                        </a>
+                    </div>
+
+                    {/* LIENS LÉGAUX (RGPD) */}
+                    <div style={{ display: "flex", gap: 24 }}>
+                        <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                            onMouseEnter={e => e.target.style.color = txt}
+                            onMouseLeave={e => e.target.style.color = muted}>
+                            Mentions Légales
+                        </a>
+                        <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                            onMouseEnter={e => e.target.style.color = txt}
+                            onMouseLeave={e => e.target.style.color = muted}>
+                            Politique de Confidentialité (RGPD)
+                        </a>
+                        <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                            onMouseEnter={e => e.target.style.color = txt}
+                            onMouseLeave={e => e.target.style.color = muted}>
+                            Gestion des Cookies
+                        </a>
+                    </div>
                 </div>
             </footer>
 
