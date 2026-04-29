@@ -124,8 +124,8 @@ function Carousel({ items, dark }) {
                                     }}
                                 />
                             </div>
-                            <div style={{ color: "#fff", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 400 }}>{item.label}</div>
-                            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, letterSpacing: 2, marginTop: 6, textTransform: "uppercase" }}>{item.sub}</div>
+                            <div style={{ color: "#fff", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 400, zIndex: 1 }}>{item.label}</div>
+                            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, letterSpacing: 2, marginTop: 6, textTransform: "uppercase", zIndex: 1 }}>{item.sub}</div>
                         </div>
                     );
                 })}
@@ -192,7 +192,7 @@ export default function App() {
         return () => window.removeEventListener("scroll", h);
     }, []);
 
-    const bg = dark ? C.ink : C.cream;
+    const bg = dark ? C.ink : `linear-gradient(0deg, #d4e6ff 0%, #d4e6ff 5%, ${C.cream} 70%, ${C.cream} 100%)`;
     const txt = dark ? "#f0eef8" : C.ink;
     const muted = dark ? "#8b8aaa" : "#6a6880";
     const cardBg = dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
@@ -303,7 +303,7 @@ export default function App() {
                         Finalement après quelques déménagements, je décide de me former à ma passion pour concrétiser des projets perso (l'illustration d'un jeu de société, la création d'un livre pour enfant). Je me forme donc à l'illustration avec l'école EDAA pour gagner en légitimité et compétences.
                     </p>
                     <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
-                        En 2025, je décide de me lancer à mon compte avec ma petite entreprise, c'est là qu'est né Coroller Illustration. Et, je rejoins un groupe d'entraide d'artistes : le Collecti'fées pour ne pas être seule avec mes créations et mes projets.
+                        En 2025, je décide de me lancer à mon compte avec ma petite entreprise, c'est là qu'est né Coroller Illustration. Et, je rejoins un groupe d'entraide d'artistes : le Collecti'fées pour ne pas être seule avec mes créations et mes projets.
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
                         {[["150+", "Illustrations"], ["80+", "Pièces crochet"], ["40+", "Clients satisfaits"]].map(([n, l]) => (
@@ -350,10 +350,10 @@ export default function App() {
                             De la découverte à la révélation.
                         </h2>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 20, fontSize: 15 }}>
-                            J'ai découvert par hasard :un kit pour créer un amigurumi et ça a été la révélation ! Activité antistress que je ne peux plus lâcher je me mets à créer, créer, créer … tellement bien que je me dis au bout d'un certain nombre de peluches accumulées qu'il serait pertinent de les distribuer ! Alors pourquoi ne pas les vendre, et combiner cette activité créatrice à mon entreprise...
+                            J'ai découvert par hasard :un kit pour créer un amigurumi et ça a été la révélation ! Activité antistress que je ne peux plus lâcher je me mets à créer, créer, créer … tellement bien que je me dis au bout d'un certain nombre de peluches accumulées qu'il serait pertinent de les distribuer ! Alors pourquoi ne pas les vendre, et combiner cette activité créatrice à mon entreprise...
                         </p>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
-                            C'est ainsi que j'en suis arrivée à inclure du crochet à Coroller Illustration. Je crée des peluches, petites, grandes, en porte clef... et des plantes. Des plantes, parce que c'est une passion chez moi, les multiplier, les offrir, les rempoter, les voir grandir ! Et j'étais bien trop triste de voir que certaines personnes ne pouvaient pas en avoir chez elles : un chat qui détruit tout, un emploi du temps qui ne permet pas de s'en occuper, un appart sans luminosité … Les plantes en crochet sont donc la solution à ce problème !
+                            C'est ainsi que j'en suis arrivée à inclure du crochet à Coroller Illustration. Je crée des peluches, petites, grandes, en porte clef... et des plantes. Des plantes, parce que c'est une passion chez moi, les multiplier, les offrir, les rempoter, les voir grandir ! Et j'étais bien trop triste de voir que certaines personnes ne pouvaient pas en avoir chez elles : un chat qui détruit tout, un emploi du temps qui ne permet pas de s'en occuper, un appart sans luminosité … Les plantes en crochet sont donc la solution à ce problème !
                         </p>
                         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                             <CTABtn>Galerie complète →</CTABtn>
@@ -368,7 +368,7 @@ export default function App() {
             <section id="contact" className="reveal" style={{ padding: "0 40px 100px" }}>
                 <div style={{
                     maxWidth: 1600, margin: "0 auto",
-                    background: dark ? "linear-gradient(135deg,#1a1640 0%,#2a204a 50%,#1a1030 100%)" : "linear-gradient(135deg,#eae6f8 0%,#ddd8f5 50%,#e8e2f5 100%)",
+                    background: dark ? "linear-gradient(135deg,#1a1640 0%,#2a204a 50%,#1a1030 100%)" : "linear-gradient(135deg, #92bbf3 0%, #b8d4ff 50%, #d4e6ff 100%)",
                     borderRadius: 28, padding: "80px 64px",
                     border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(79,71,144,0.12)"}`,
                     display: "grid", gridTemplateColumns: "1fr auto", gap: 48, alignItems: "center",
@@ -393,12 +393,15 @@ export default function App() {
             <footer style={{ borderTop: `1px solid ${divider}`, padding: "60px 40px" }}>
                 <div style={{ maxWidth: 1600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 40 }}>
 
-                    {/* IDENTITÉ */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>
-                            Coroller Illustration & Crochet
-                        </span>
-                        <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi</span>
+                    {/* IDENTITÉ AVEC LOGO */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        <img src={logo} alt="Logo" style={{ height: 50, width: "auto", objectFit: "contain" }} />
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>
+                                Coroller Illustration & Crochet
+                            </span>
+                            <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi</span>
+                        </div>
                     </div>
 
                     {/* RÉSEAUX & CONTACT AVEC VRAIS LOGOS STYLÉS */}
