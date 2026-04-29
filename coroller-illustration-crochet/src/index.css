@@ -1,3 +1,8 @@
+/*Retour smooth à la home page*/
+html {
+  scroll-behavior: smooth;
+}
+
 /* Supprime les marges par défaut du navigateur */
 html,
 body {
