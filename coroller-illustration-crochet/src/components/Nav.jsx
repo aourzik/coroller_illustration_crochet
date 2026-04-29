@@ -14,7 +14,7 @@ export default function Nav({ dark, setDark, scrolled, txt, muted, C, cardBg, ca
             <div style={{ maxWidth: 1600, margin: "0 auto", padding: "0 40px", height: 80, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
                 {/* LOGO : Ramène à la racine "/" */}
-                <Link to="/" style={{ textDecoration: "none" }}>
+                <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ textDecoration: "none" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <img src={logo} alt="Logo" style={{ height: 60, width: "auto", objectFit: "contain" }} />
                         <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>

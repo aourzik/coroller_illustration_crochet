@@ -191,7 +191,7 @@ export default function App() {
                 : (dark ? C.accent : "#7a9cd6"),
 
             color: outline ? txt : "#fff",
-            border: outline ? `1px solid ${dark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)"}` : "none",
+            border: outline ? `1px solid ${dark ? "rgba(255,255,255,0.2)" : C.accent}` : "none",
             borderRadius: 10,
             padding: "13px 28px",
             fontWeight: 700,
@@ -328,7 +328,7 @@ export default function App() {
                                 </p>
                                 <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                                     <Link to="/galerie-illustrations"><CTABtn>Galerie complète →</CTABtn></Link>
-                                    <CTABtn outline>Commande personnalisée</CTABtn>
+                                    <CTABtn outline onClick={() => setModal(true)}>Commande personnalisée</CTABtn>
                                 </div>
                             </div>
                         </section>

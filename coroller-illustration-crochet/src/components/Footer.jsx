@@ -1,4 +1,5 @@
 import logo from "../assets/images/logo.png";
+import { Link } from "react-router-dom";
 
 export default function Footer({ divider, logoStyle, txt, muted }) {
     return (
@@ -69,7 +70,19 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
-                        <span>Contact</span>
+                        <Link
+                            to="/contact"
+                            style={{
+                                color: muted,
+                                textDecoration: "none",
+                                fontSize: "14px",
+                                transition: "color 0.3s"
+                            }}
+                            onMouseEnter={(e) => e.target.style.color = txt}
+                            onMouseLeave={(e) => e.target.style.color = muted}
+                        >
+                            Contact
+                        </Link>
                     </a>
                 </div>
 
