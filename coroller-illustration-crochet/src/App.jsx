@@ -236,10 +236,12 @@ export default function App() {
             {/* NAV */}
             <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: dark ? scrolled ? "rgba(13, 11, 26, 0.51)" : "transparent" : scrolled ? "rgba(250, 248, 244, 0.51)" : "transparent", backdropFilter: scrolled ? "blur(50px)" : "none", borderBottom: scrolled ? `1px solid ${divider}` : "1px solid transparent", transition: "all .2s" }}>
                 <div style={{ maxWidth: 1600, margin: "0 auto", padding: "0 40px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <img src={logo} alt="Logo" style={{ height: 40, width: "auto", objectFit: "contain" }} />
-                        <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>Coroller<br />Illustration & Crochet</span>
-                    </div>
+                    <a href="#hero" style={{ textDecoration: "none" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <img src={logo} alt="Logo" style={{ height: 40, width: "auto", objectFit: "contain" }} />
+                            <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>Coroller<br />Illustration & Crochet</span>
+                        </div>
+                    </a>
                     <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
                         {["À propos", "Illustrations", "Crochet", "Contact"].map(l => (
                             <a key={l} href={`#${l.replace("À", "a").replace(" ", "-").toLowerCase()}`}
@@ -255,7 +257,7 @@ export default function App() {
             </nav>
 
             {/* HERO */}
-            <section style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", maxWidth: "100%", margin: "0 auto", zIndex: 1, overflow: "hidden" }}>
+            <section id="hero" style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", maxWidth: "100%", margin: "0 auto", zIndex: 1, overflow: "hidden" }}>
                 <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.6, pointerEvents: "none" }}>
                     <iframe src="https://my.spline.design/maskimagerevealcopycopy-tjKszRnI28NNBDPRI65AaOth-eLk/" frameBorder="0" width="100%" height="120%" style={{ transform: "scale(1.1)", filter: dark ? "brightness(0.8) contrast(1.2)" : "none" }}></iframe>
                 </div>
@@ -319,7 +321,7 @@ export default function App() {
             </section>
 
             {/* ILLUSTRATIONS */}
-            <section id="illustrations" className="reveal" style={{ borderTop: `1px solid ${divider}` }}>
+            <section id="illustrations" className="reveal" style={{}}>
                 <div style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
                     <Carousel items={illus} dark={dark} />
                     <div>
@@ -342,7 +344,7 @@ export default function App() {
             </section>
 
             {/* CROCHET */}
-            <section id="crochet" className="reveal" style={{ borderTop: `1px solid ${divider}` }}>
+            <section id="crochet" className="reveal" style={{}}>
                 <div style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
                     <div>
                         <Tag label="Créations crochet" />
