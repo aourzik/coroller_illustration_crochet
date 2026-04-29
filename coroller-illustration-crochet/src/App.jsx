@@ -238,7 +238,7 @@ export default function App() {
                 <div style={{ maxWidth: 1600, margin: "0 auto", padding: "0 40px", height: 68, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <img src={logo} alt="Logo" style={{ height: 40, width: "auto", objectFit: "contain" }} />
-                        <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>Coroller Illustration & Crochet</span>
+                        <span style={{ fontFamily: "Georgia,serif", fontSize: 16, letterSpacing: 1, color: txt }}>Coroller<br />Illustration & Crochet</span>
                     </div>
                     <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
                         {["À propos", "Illustrations", "Crochet", "Contact"].map(l => (
@@ -256,7 +256,7 @@ export default function App() {
 
             {/* HERO */}
             <section style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", maxWidth: "100%", margin: "0 auto", zIndex: 1, overflow: "hidden" }}>
-                <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.2, pointerEvents: "none" }}>
+                <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.6, pointerEvents: "none" }}>
                     <iframe src="https://my.spline.design/maskimagerevealcopycopy-tjKszRnI28NNBDPRI65AaOth-eLk/" frameBorder="0" width="100%" height="120%" style={{ transform: "scale(1.1)", filter: dark ? "brightness(0.8) contrast(1.2)" : "none" }}></iframe>
                 </div>
                 <div style={{ position: "relative", zIndex: 1, maxWidth: 780 }}>
@@ -292,15 +292,18 @@ export default function App() {
                     </div>
                 </div>
                 <div>
-                    <Tag label="À propos" />
+                    <Tag label="Qui suis-je ?" />
                     <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2rem,4vw,2.6rem)", fontWeight: 400, margin: "16px 0 24px", lineHeight: 1.15, color: txt }}>
-                        Basée à Albi,<br />créatrice de l'imaginaire.
+                        Une rêveuse,<br />enfant cachée dans le corps d'une adulte qui croit toujours aux fées.
                     </h2>
                     <p style={{ color: muted, lineHeight: 1.9, marginBottom: 20, fontSize: 15 }}>
-                        Depuis 2016, je transforme des émotions en formes visuelles — à travers l'illustration numérique et le textile artisanal. Mon travail explore la frontière entre le tangible et l'onirique.
+                        Mon parcours n'est pas linéaire. J'ai commencé par suivre des études de psychologie. Diplômée en 2018, j'ai voulu m'engager dans un service civique avant de me lancer sur le marché du travail. Cette expérience m'a fait bifurquer dans le champ du social, dans la branche associative.
                     </p>
                     <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
-                        Chaque projet, qu'il soit une commande éditoriale ou une peluche sur-mesure, reçoit la même attention minutieuse. Je crois que les objets qu'on choisit de faire entrer dans notre vie doivent avoir une âme.
+                        Finalement après quelques déménagements, je décide de me former à ma passion pour concrétiser des projets perso (l'illustration d'un jeu de société, la création d'un livre pour enfant). Je me forme donc à l'illustration avec l'école EDAA pour gagner en légitimité et compétences.
+                    </p>
+                    <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
+                        En 2025, je décide de me lancer à mon compte avec ma petite entreprise, c'est là qu'est né Coroller Illustration. Et, je rejoins un groupe d'entraide d'artistes : le Collecti'fées pour ne pas être seule avec mes créations et mes projets.
                     </p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
                         {[["150+", "Illustrations"], ["80+", "Pièces crochet"], ["40+", "Clients satisfaits"]].map(([n, l]) => (
@@ -325,10 +328,10 @@ export default function App() {
                             Des récits visuels qui traversent le temps.
                         </h2>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 20, fontSize: 15 }}>
-                            Illustrations éditoriales, prints d'art et commandes personnalisées. Mon univers mêle botanique, cosmos et poésie du quotidien dans une palette soigneusement maîtrisée.
+                            Mon univers est inspiré de l'imaginaire, de la nature, de la fantaisie. Je crée des images à l'aquarelle et aux crayons de couleurs.
                         </p>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
-                            Disponibles en formats numériques haute résolution ou en tirages d'art numérotés et signés. Collaborations presse et édition bienvenues.
+                            Chaque illustration est une invitation à un voyage visuel, une histoire figée dans le temps qui attend d'être découverte.
                         </p>
                         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                             <CTABtn>Galerie complète →</CTABtn>
@@ -344,17 +347,17 @@ export default function App() {
                     <div>
                         <Tag label="Créations crochet" />
                         <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, margin: "16px 0 24px", lineHeight: 1.15, color: txt }}>
-                            La lenteur comme acte de création.
+                            De la découverte à la révélation.
                         </h2>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 20, fontSize: 15 }}>
-                            Amigurumi, objets décoratifs et pièces textiles réalisés à la main avec des fils naturels soigneusement sélectionnés — laine mérinos, coton biologique, alpaga.
+                            J'ai découvert par hasard :un kit pour créer un amigurumi et ça a été la révélation ! Activité antistress que je ne peux plus lâcher je me mets à créer, créer, créer … tellement bien que je me dis au bout d'un certain nombre de peluches accumulées qu'il serait pertinent de les distribuer ! Alors pourquoi ne pas les vendre, et combiner cette activité créatrice à mon entreprise...
                         </p>
                         <p style={{ color: muted, lineHeight: 1.9, marginBottom: 36, fontSize: 15 }}>
-                            Chaque pièce est unique. Je propose des créations sur commande pour des cadeaux qui sortent de l'ordinaire, ou des collections en édition limitée disponibles en boutique.
+                            C'est ainsi que j'en suis arrivée à inclure du crochet à Coroller Illustration. Je crée des peluches, petites, grandes, en porte clef... et des plantes. Des plantes, parce que c'est une passion chez moi, les multiplier, les offrir, les rempoter, les voir grandir ! Et j'étais bien trop triste de voir que certaines personnes ne pouvaient pas en avoir chez elles : un chat qui détruit tout, un emploi du temps qui ne permet pas de s'en occuper, un appart sans luminosité … Les plantes en crochet sont donc la solution à ce problème !
                         </p>
                         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                            <CTABtn>Voir la boutique →</CTABtn>
-                            <CTABtn outline onClick={() => setModal(true)}>Commander sur-mesure</CTABtn>
+                            <CTABtn>Galerie complète →</CTABtn>
+                            <CTABtn outline onClick={() => setModal(true)}>Commande personnalisée</CTABtn>
                         </div>
                     </div>
                     <Carousel items={croch} dark={dark} />
@@ -372,11 +375,11 @@ export default function App() {
                 }}>
                     <div>
                         <Tag label="Collaboration" />
-                        <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2rem,4vw,3.2rem)", fontWeight: 400, color: txt, margin: "16px 0 20px", lineHeight: 1.15 }}>
-                            Votre vision mérite<br />un traitement d'exception.
+                        <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(1rem,4vw,2rem)", fontWeight: 400, color: txt, margin: "16px 0 20px", lineHeight: 1.15 }}>
+                            J'espère que mon univers te parlera, <br />qu'il fera écho à ton enfant intérieur, le ravivera peut-être.
                         </h2>
                         <p style={{ color: muted, fontSize: 15, lineHeight: 1.8, maxWidth: 480, marginBottom: 0 }}>
-                            Illustration éditoriale, packaging, peluche sur-mesure ou projet créatif collaboratif — discutons de ce que vous avez en tête.
+                            Si mes créations correspondent à une idée, un projet que tu voudrais réaliser n'hésite pas à me contacter pour en discuter !
                         </p>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-end" }}>
