@@ -12,6 +12,7 @@ import Modal from "./components/Modal";
 import GalerieIllustrations from "./pages/GalerieIllustrations";
 import GalerieCrochet from "./pages/GalerieCrochet";
 import PageContact from "./pages/PageContact";
+import MentionsLegales from "./pages/MentionsLegales";
 
 export const C = {
     ink: "#0d0b1a",
@@ -385,6 +386,7 @@ export default function App() {
                 <Route path="/galerie-illustrations" element={<GalerieIllustrations dark={dark} />} />
                 <Route path="/galerie-crochet" element={<GalerieCrochet dark={dark} />} />
                 <Route path="/contact" element={<PageContact dark={dark} />} />
+                <Route path="/mentions-legales" element={<MentionsLegales dark={dark} />} />
             </Routes>
 
             <Footer divider={divider} txt={txt} muted={muted} logo={logo} />

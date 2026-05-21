@@ -1,6 +1,7 @@
 import logo from "../assets/images/logo.png";
 import { Link } from "react-router-dom";
 
+
 export default function Footer({ divider, logoStyle, txt, muted }) {
     return (
         <footer style={{ borderTop: `1px solid ${divider}`, padding: "60px 40px" }}>
@@ -88,19 +89,30 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
 
                 {/* LIENS LÉGAUX (RGPD) */}
                 <div style={{ display: "flex", gap: 24 }}>
-                    <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                    <Link 
+                        to="/mentions-legales" 
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
-                        onMouseLeave={e => e.target.style.color = muted}>
+                        onMouseLeave={e => e.target.style.color = muted}
+                    >
                         Mentions Légales
-                    </a>
-                    <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                    </Link>
+                    
+                    <a 
+                        href="#" 
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
-                        onMouseLeave={e => e.target.style.color = muted}>
+                        onMouseLeave={e => e.target.style.color = muted}
+                    >
                         Politique de Confidentialité (RGPD)
                     </a>
-                    <a href="#" style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500 }}
+                    
+                    <a 
+                        href="#" 
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
-                        onMouseLeave={e => e.target.style.color = muted}>
+                        onMouseLeave={e => e.target.style.color = muted}
+                    >
                         Gestion des Cookies
                     </a>
                 </div>

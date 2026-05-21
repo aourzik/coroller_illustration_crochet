@@ -57,7 +57,7 @@ export default function PageContact({ dark }) {
                     Contact
                 </h1>
                 <p style={{ color: "#8b8aaa", fontSize: "18px", lineHeight: "1.6" }}>
-                    Un projet d'illustration, une envie de crochet sur mesure ou juste un petit mot doux ? Marie vous répondra avec plaisir.
+                    Un projet d'illustration, une envie de crochet sur mesure ou juste un petit mot doux ? Je vous recontacterai au plus vite.
                 </p>
             </div>
 
