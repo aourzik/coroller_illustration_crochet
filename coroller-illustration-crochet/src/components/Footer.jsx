@@ -1,5 +1,6 @@
 import logo from "../assets/images/logo.png";
 import { Link } from "react-router-dom";
+import React from "react";
 
 
 export default function Footer({ divider, logoStyle, txt, muted }) {
@@ -98,14 +99,14 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                         Mentions Légales
                     </Link>
                     
-                    <a 
-                        href="#" 
+                    <Link 
+                        to="/politique-confidentialite" 
                         style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
                         onMouseLeave={e => e.target.style.color = muted}
                     >
                         Politique de Confidentialité (RGPD)
-                    </a>
+                    </Link>
                     
                     <a 
                         href="#" 

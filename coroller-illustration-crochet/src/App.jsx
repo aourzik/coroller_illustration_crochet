@@ -13,6 +13,7 @@ import GalerieIllustrations from "./pages/GalerieIllustrations";
 import GalerieCrochet from "./pages/GalerieCrochet";
 import PageContact from "./pages/PageContact";
 import MentionsLegales from "./pages/MentionsLegales";
+import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 
 export const C = {
     ink: "#0d0b1a",
@@ -387,6 +388,7 @@ export default function App() {
                 <Route path="/galerie-crochet" element={<GalerieCrochet dark={dark} />} />
                 <Route path="/contact" element={<PageContact dark={dark} />} />
                 <Route path="/mentions-legales" element={<MentionsLegales dark={dark} />} />
+                <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite dark={dark} />} />
             </Routes>
 
             <Footer divider={divider} txt={txt} muted={muted} logo={logo} />
