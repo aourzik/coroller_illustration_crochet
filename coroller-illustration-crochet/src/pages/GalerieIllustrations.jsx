@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { C } from "../App"; // On importe les couleurs globales
+import { C } from "../App"; 
 
 const allIllus = [
     { img: "/illu_1.png", label: "La Louve", size: "large" },
