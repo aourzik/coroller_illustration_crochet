@@ -51,7 +51,7 @@ export default function Modal({ onClose, dark }) {
 
                 <form ref={form} onSubmit={sendEmail}>
                     <h2 style={{ fontFamily: "Georgia, serif", marginBottom: "8px", color: dark ? "#fff" : "#0d0b1a" }}>Parlons de votre projet</h2>
-                    <p style={{ color: "#8b8aaa", fontSize: "14px", marginBottom: "24px" }}>Marie vous répondra sous 48h.</p>
+                    <p style={{ color: "#8b8aaa", fontSize: "14px", marginBottom: "24px" }}>Je vous recontacterai au plus vite.</p>
 
                     {/* Les 'name' doivent être identiques à ceux de ton template EmailJS */}
                     <input type="text" name="user_name" placeholder="Votre nom" required style={inputStyle} />
