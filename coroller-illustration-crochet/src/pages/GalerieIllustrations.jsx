@@ -8,13 +8,13 @@ const allIllus = [
     { img: "/illu_3.png", label: "Le Chat", size: "medium" },
     { img: "/illu_4.png", label: "Le Renard", size: "medium" },
     { img: "/illu_5.png", label: "La Sorcière", size: "medium" },
-    { img: "/illu_6.png", label: "Le Hérisson", size: "medium" },
-    { img: "/illu_7.png", label: "La Licorne", size: "medium" },
-    { img: "/illu_8.png", label: "Le Loup et la Lune", size: "medium" },
-    { img: "/illu_9.png", label: "Le Corbeau et le Renard", size: "medium" },
-    { img: "/illu_10.png", label: "Le Chat Botté", size: "medium" },
-    { img: "/illu_11.png", label: "La Belle au Bois Dormant", size: "medium" },
-    { img: "/illu_12.png", label: "Le Petit Chaperon Rouge", size: "medium" },
+    { img: "/illu_6.png", label: "Le Chat sur la Lune", size: "medium" },
+    { img: "/illu_7.png", label: "Le livre", size: "medium" },
+    { img: "/illu_8.png", label: "Wonder Ginger", size: "medium" },
+    { img: "/illu_9.png", label: "Le Mariage", size: "medium" },
+    { img: "/illu_10.png", label: "Bzzz", size: "medium" },
+
+    { img: "/illu_12.png", label: "Le cycliste", size: "medium" },
 ];
 
 export default function GalerieIllustrations({ dark }) {
