@@ -4,7 +4,7 @@ import { C } from "../App"; // On importe les couleurs globales
 
 const allCroch = [
     { img: "/croch.png", label: "La Cocotte", size: "large" },
-    { img: "/croch1.png", label: "Pomme de Terre", size: "medium" },
+    //{ img: "/croch1.png", label: "Pomme de Terre", size: "medium" },
     { img: "/croch2.png", label: "Le Renard", size: "medium" },
     { img: "/croch3.png", label: "Le Hibou", size: "medium" },
     { img: "/croch4.png", label: "Le Cactus", size: "medium" },
@@ -12,9 +12,9 @@ const allCroch = [
     { img: "/croch6.png", label: "Le Poulpe", size: "medium" },
     { img: "/croch7.png", label: "Le Cerf", size: "medium" },
     { img: "/croch8.png", label: "Le Baby Dinosaur", size: "medium" },
-    { img: "/croch9.png", label: "Le Baby Dinosaur", size: "medium" },
-    { img: "/croch10.png", label: "La Belle au Bois Dormant", size: "medium" },
-    { img: "/croch11.png", label: "Le Petit Chaperon Rouge", size: "medium" },
+    //{ img: "/croch9.png", label: "Le Baby Dinosaur", size: "medium" },
+    //{ img: "/croch10.png", label: "La Belle au Bois Dormant", size: "medium" },
+   // { img: "/croch11.png", label: "Le Petit Chaperon Rouge", size: "medium" },
 ];
 
 export default function GalerieCrochet({ dark }) {
