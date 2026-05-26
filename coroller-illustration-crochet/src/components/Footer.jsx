@@ -110,7 +110,11 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                     
                     <a 
                         href="#" 
-                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
+                        onClick={(e) => {
+                        e.preventDefault();
+                        alert("Ce site respecte votre vie privée : aucun cookie publicitaire ou traceur tiers n'est utilisé. Seuls des cookies techniques essentiels à la navigation peuvent être déposés.");
+                        }}
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, fontFamily: "Corbel, sans-serif", transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
                         onMouseLeave={e => e.target.style.color = muted}
                     >
