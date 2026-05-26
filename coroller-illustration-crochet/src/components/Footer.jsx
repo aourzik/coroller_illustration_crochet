@@ -15,7 +15,7 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                         <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>
                             Coroller Illustration & Crochet
                         </span>
-                        <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi</span>
+                        <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi par Aïny Ourzik</span>
                     </div>
                 </div>
 
