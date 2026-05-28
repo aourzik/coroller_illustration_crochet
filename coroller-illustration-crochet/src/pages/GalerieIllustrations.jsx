@@ -13,7 +13,6 @@ const allIllus = [
     { img: "/illu_8.png", label: "Wonder Ginger", size: "medium" },
     { img: "/illu_9.png", label: "Le Mariage", size: "medium" },
     { img: "/illu_10.png", label: "Bzzz", size: "medium" },
-
     { img: "/illu_12.png", label: "Le cycliste", size: "medium" },
 ];
 

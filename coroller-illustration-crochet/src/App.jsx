@@ -6,6 +6,7 @@ import mariePhoto from "./assets/images/marie.jpg";
 import logo from "./assets/images/logo.png";
 
 // --- IMPORTS COMPOSANTS ET PAGES ---
+import DashboardAdmin from "./pages/DashboardAdmin";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import Modal from "./components/Modal";
@@ -389,6 +390,7 @@ export default function App() {
                 <Route path="/contact" element={<PageContact dark={dark} />} />
                 <Route path="/mentions-legales" element={<MentionsLegales dark={dark} />} />
                 <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite dark={dark} />} />
+                <Route path="/marie-admin" element={<DashboardAdmin dark={dark} />} />
             </Routes>
 
             <Footer divider={divider} txt={txt} muted={muted} logo={logo} />

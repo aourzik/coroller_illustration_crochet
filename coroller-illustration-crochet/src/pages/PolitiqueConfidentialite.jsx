@@ -1,5 +1,6 @@
 import React from "react";
 import { C } from "../App";
+import { Link } from "react-router-dom";
 
 export default function PolitiqueConfidentialite({ dark }) {
     const txt = dark ? "#f0eef8" : "#0d0b1a";
@@ -20,7 +21,7 @@ export default function PolitiqueConfidentialite({ dark }) {
         }}>
             <div style={{ maxWidth: "800px", margin: "0 auto" }}>
                 <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "40px" }}>
-                    Politique de Confidentialité (RGPD)
+                    Politique de Confidentialité (<Link to="/marie-admin" style={{ color: "inherit", textDecoration: "none", cursor: "default" }}> RGPD </Link>)
                 </h1>
 
                 <p style={{ color: muted, lineHeight: "1.6", marginBottom: "32px" }}>

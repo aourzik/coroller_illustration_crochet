@@ -2,8 +2,7 @@ import logo from "../assets/images/logo.png";
 import { Link } from "react-router-dom";
 import React from "react";
 
-
-export default function Footer({ divider, logoStyle, txt, muted }) {
+export default function Footer({ divider, txt, muted }) {
     return (
         <footer style={{ borderTop: `1px solid ${divider}`, padding: "60px 40px" }}>
             <div style={{ maxWidth: 1600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 40 }}>
@@ -15,7 +14,11 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                         <span style={{ fontFamily: "Georgia,serif", fontSize: 18, color: txt, letterSpacing: 1 }}>
                             Coroller Illustration & Crochet
                         </span>
-                        <span style={{ color: muted, fontSize: 12 }}>© 2026 · Fait avec passion à Albi par Aïny Ourzik</span>
+                        <span style={{ color: muted, fontSize: 12 }}>
+                            © 2026 · Fait avec passion à Albi par Aïny Ourzik
+                            {/* 🔥 LE LIEN SECRET EST CACHÉ SUR CE POINT FINAL ! */}
+                            <Link to="/marie-admin" style={{ color: "inherit", textDecoration: "none", cursor: "default" }}>.</Link>
+                        </span>
                     </div>
                 </div>
 
@@ -49,8 +52,8 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                         <span>Instagram</span>
                     </a>
 
-                    {/* Email / Contact */}
-                    <a href="mailto:tonemail@exemple.com"
+                    {/* Email / Contact (Correction de l'imbrication ici) */}
+                    <Link to="/contact"
                         style={{
                             color: muted,
                             textDecoration: "none",
@@ -72,27 +75,15 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
-                        <Link
-                            to="/contact"
-                            style={{
-                                color: muted,
-                                textDecoration: "none",
-                                fontSize: "14px",
-                                transition: "color 0.3s"
-                            }}
-                            onMouseEnter={(e) => e.target.style.color = txt}
-                            onMouseLeave={(e) => e.target.style.color = muted}
-                        >
-                            Contact
-                        </Link>
-                    </a>
+                        <span>Contact</span>
+                    </Link>
                 </div>
 
                 {/* LIENS LÉGAUX (RGPD) */}
                 <div style={{ display: "flex", gap: 24 }}>
                     <Link 
                         to="/mentions-legales" 
-                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, fontFamily: "Corbel, sans-serif", transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
                         onMouseLeave={e => e.target.style.color = muted}
                     >
@@ -101,7 +92,7 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                     
                     <Link 
                         to="/politique-confidentialite" 
-                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, transition: "color 0.2s" }}
+                        style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, fontFamily: "Corbel, sans-serif", transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
                         onMouseLeave={e => e.target.style.color = muted}
                     >
@@ -111,8 +102,8 @@ export default function Footer({ divider, logoStyle, txt, muted }) {
                     <a 
                         href="#" 
                         onClick={(e) => {
-                        e.preventDefault();
-                        alert("Ce site respecte votre vie privée : aucun cookie publicitaire ou traceur tiers n'est utilisé. Seuls des cookies techniques essentiels à la navigation peuvent être déposés.");
+                            e.preventDefault();
+                            alert("Ce site respecte votre vie privée : aucun cookie publicitaire ou traceur tiers n'est utilisé. Seuls des cookies techniques essentiels à la navigation peuvent être déposés.");
                         }}
                         style={{ color: muted, fontSize: 12, textDecoration: "none", fontWeight: 500, fontFamily: "Corbel, sans-serif", transition: "color 0.2s" }}
                         onMouseEnter={e => e.target.style.color = txt}
