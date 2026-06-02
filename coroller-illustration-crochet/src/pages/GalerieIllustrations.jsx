@@ -1,22 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; // 👈 Intégration de useState et useEffect
 import { Link } from "react-router-dom";
 import { C } from "../App"; 
-
-const allIllus = [
-    { img: "/illu_1.png", label: "La Louve", size: "large" },
-    { img: "/illu_2.png", label: "Pomme de Terre", size: "medium" },
-    { img: "/illu_3.png", label: "Le Chat", size: "medium" },
-    { img: "/illu_4.png", label: "Le Renard", size: "medium" },
-    { img: "/illu_5.png", label: "La Sorcière", size: "medium" },
-    { img: "/illu_6.png", label: "Le Chat sur la Lune", size: "medium" },
-    { img: "/illu_7.png", label: "Le livre", size: "medium" },
-    { img: "/illu_8.png", label: "Wonder Ginger", size: "medium" },
-    { img: "/illu_9.png", label: "Le Mariage", size: "medium" },
-    { img: "/illu_10.png", label: "Bzzz", size: "medium" },
-    { img: "/illu_12.png", label: "Le cycliste", size: "medium" },
-];
+import { supabase } from "../supabaseClient"; // 👈 Connexion au client Supabase
 
 export default function GalerieIllustrations({ dark }) {
+    // Liste dynamique des illustrations chargées depuis Supabase
+    const [allIllus, setAllIllus] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchIllustrations() {
+            try {
+                const { data, error } = await supabase
+                    .from("oeuvres")
+                    .select("*")
+                    .eq("category", "illustration"); // 🎯 Filtre uniquement sur la catégorie illustration
+
+                if (error) throw error;
+                if (data) setAllIllus(data);
+            } catch (error) {
+                console.error("Erreur lors de la récupération des illustrations :", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchIllustrations();
+    }, []);
+
     const txt = dark ? "#f0eef8" : "#0d0b1a";
     const muted = dark ? "#8b8aaa" : "#6a6880";
     const cardBorder = dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
@@ -53,8 +64,8 @@ export default function GalerieIllustrations({ dark }) {
 
     return (
         <div style={{ 
-            position: "relative", // Obligatoire pour que les bulles ne s'échappent pas
-            overflow: "hidden",   // Empêche les bulles de créer un scroll horizontal
+            position: "relative", 
+            overflow: "hidden",   
             minHeight: "100vh",
             background: dark 
             ? C.ink 
@@ -62,7 +73,7 @@ export default function GalerieIllustrations({ dark }) {
             transition: "all .5s"
         }}>
             
-            {/* --- LES BULLES D'AMBIANCE (IDENTIQUES À APP.JSX) --- */}
+            {/* --- LES BULLES D'AMBIANCE --- */}
             <div style={{ 
                 position: "absolute", top: "-100px", left: "-15%", 
                 width: "80vw", height: "80vw", borderRadius: "50%", 
@@ -78,7 +89,7 @@ export default function GalerieIllustrations({ dark }) {
 
             {/* CONTENU PRINCIPAL */}
             <div style={{ 
-                position: "relative", // Pour passer au-dessus des bulles
+                position: "relative", 
                 zIndex: 1,
                 maxWidth: 1600, margin: "0 auto", padding: "140px 40px 100px" 
             }}>
@@ -113,42 +124,48 @@ export default function GalerieIllustrations({ dark }) {
                     </Link>
                 </div>
 
-                {/* LA MOSAÏQUE */}
-                <div style={{ 
-                    display: "grid", 
-                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
-                    gridAutoRows: "200px", 
-                    gap: 24, 
-                    gridAutoFlow: "dense" 
-                }}>
-                    {allIllus.map((item, i) => (
-                        <div key={i} style={{ 
-                            gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`, 
-                            position: "relative", 
-                            borderRadius: 24, 
-                            overflow: "hidden", 
-                            background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-                            border: `1px solid ${cardBorder}` 
-                        }}>
-                            <img src={item.img} alt={item.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            
-                            <div style={{ 
-                                position: "absolute", inset: 0, 
-                                background: "rgba(13, 11, 26, 0.7)", opacity: 0, 
-                                display: "flex", flexDirection: "column", gap: "12px",
-                                alignItems: "center", justifyContent: "center", 
-                                transition: "0.3s", backdropFilter: "blur(4px)"
-                            }} 
-                            onMouseEnter={e => e.currentTarget.style.opacity = 1} 
-                            onMouseLeave={e => e.currentTarget.style.opacity = 0}>
-                                <span style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "1.2rem" }}>{item.label}</span>
-                                <Link to="/contact">
-                                    <button style={{ background: "#fd6a3d", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Commander ?</button>
-                                </Link>
+                {/* LA MOSAÏQUE DYNAMIQUE */}
+                {loading ? (
+                    <p style={{ textAlign: "center", color: muted, fontSize: "1.1rem", fontFamily: "Georgia, serif" }}>Chargement des illustrations de Marie...</p>
+                ) : allIllus.length === 0 ? (
+                    <p style={{ textAlign: "center", color: muted, fontSize: "1.1rem" }}>Aucune illustration n'a été publiée pour le moment.</p>
+                ) : (
+                    <div style={{ 
+                        display: "grid", 
+                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
+                        gridAutoRows: "200px", 
+                        gap: 24, 
+                        gridAutoFlow: "dense" 
+                    }}>
+                        {allIllus.map((item) => (
+                            <div key={item.id} style={{ 
+                                gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`, 
+                                position: "relative", 
+                                borderRadius: 24, 
+                                overflow: "hidden", 
+                                background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+                                border: `1px solid ${cardBorder}` 
+                            }}>
+                                <img src={item.img_url} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                
+                                <div style={{ 
+                                    position: "absolute", inset: 0, 
+                                    background: "rgba(13, 11, 26, 0.7)", opacity: 0, 
+                                    display: "flex", flexDirection: "column", gap: "12px",
+                                    alignItems: "center", justifyContent: "center", 
+                                    transition: "0.3s", backdropFilter: "blur(4px)"
+                                }} 
+                                onMouseEnter={e => e.currentTarget.style.opacity = 1} 
+                                onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                                    <span style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "1.2rem" }}>{item.title}</span>
+                                    <Link to="/contact">
+                                        <button style={{ background: "#fd6a3d", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Commander ?</button>
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

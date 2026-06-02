@@ -1,23 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; // 👈 Intégration des hooks React
 import { Link } from "react-router-dom";
-import { C } from "../App"; // On importe les couleurs globales
-
-const allCroch = [
-    { img: "/croch.png", label: "La Cocotte", size: "large" },
-    //{ img: "/croch1.png", label: "Pomme de Terre", size: "medium" },
-    { img: "/croch2.png", label: "Le Renard", size: "medium" },
-    { img: "/croch3.png", label: "Le Hibou", size: "medium" },
-    { img: "/croch4.png", label: "Le Cactus", size: "medium" },
-    { img: "/croch5.png", label: "Les Dinos", size: "medium" },
-    { img: "/croch6.png", label: "Le Poulpe", size: "medium" },
-    { img: "/croch7.png", label: "Le Cerf", size: "medium" },
-    { img: "/croch8.png", label: "Le Baby Dinosaur", size: "medium" },
-    //{ img: "/croch9.png", label: "Le Baby Dinosaur", size: "medium" },
-    //{ img: "/croch10.png", label: "La Belle au Bois Dormant", size: "medium" },
-   // { img: "/croch11.png", label: "Le Petit Chaperon Rouge", size: "medium" },
-];
+import { C } from "../App"; 
+import { supabase } from "../supabaseClient"; // 👈 Connexion Supabase
 
 export default function GalerieCrochet({ dark }) {
+    // Liste dynamique des crochets chargés depuis la base de données
+    const [allCroch, setAllCroch] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchCrochets() {
+            try {
+                const { data, error } = await supabase
+                    .from("oeuvres")
+                    .select("*")
+                    .eq("category", "crochet"); 
+
+                if (error) throw error;
+                if (data) setAllCroch(data);
+            } catch (error) {
+                console.error("Erreur lors de la récupération du crochet :", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchCrochets();
+    }, []);
+
     const txt = dark ? "#f0eef8" : "#0d0b1a";
     const muted = dark ? "#8b8aaa" : "#6a6880";
     const cardBorder = dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
@@ -54,8 +64,8 @@ export default function GalerieCrochet({ dark }) {
 
     return (
         <div style={{ 
-            position: "relative", // Obligatoire pour que les bulles ne s'échappent pas
-            overflow: "hidden",   // Empêche les bulles de créer un scroll horizontal
+            position: "relative", 
+            overflow: "hidden",   
             minHeight: "100vh",
             background: dark 
             ? C.ink 
@@ -63,7 +73,7 @@ export default function GalerieCrochet({ dark }) {
             transition: "all .5s"
         }}>
             
-            {/* --- LES BULLES D'AMBIANCE (IDENTIQUES À APP.JSX) --- */}
+            {/* --- LES BULLES D'AMBIANCE --- */}
             <div style={{ 
                 position: "absolute", top: "-100px", left: "-15%", 
                 width: "80vw", height: "80vw", borderRadius: "50%", 
@@ -79,7 +89,7 @@ export default function GalerieCrochet({ dark }) {
 
             {/* CONTENU PRINCIPAL */}
             <div style={{ 
-                position: "relative", // Pour passer au-dessus des bulles
+                position: "relative", 
                 zIndex: 1,
                 maxWidth: 1600, margin: "0 auto", padding: "140px 40px 100px" 
             }}>
@@ -114,42 +124,48 @@ export default function GalerieCrochet({ dark }) {
                     </Link>
                 </div>
 
-                {/* LA MOSAÏQUE */}
-                <div style={{ 
-                    display: "grid", 
-                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
-                    gridAutoRows: "200px", 
-                    gap: 24, 
-                    gridAutoFlow: "dense" 
-                }}>
-                    {allCroch.map((item, i) => (
-                        <div key={i} style={{ 
-                            gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`, 
-                            position: "relative", 
-                            borderRadius: 24, 
-                            overflow: "hidden", 
-                            background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-                            border: `1px solid ${cardBorder}` 
-                        }}>
-                            <img src={item.img} alt={item.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            
-                            <div style={{ 
-                                position: "absolute", inset: 0, 
-                                background: "rgba(13, 11, 26, 0.7)", opacity: 0, 
-                                display: "flex", flexDirection: "column", gap: "12px",
-                                alignItems: "center", justifyContent: "center", 
-                                transition: "0.3s", backdropFilter: "blur(4px)"
-                            }} 
-                            onMouseEnter={e => e.currentTarget.style.opacity = 1} 
-                            onMouseLeave={e => e.currentTarget.style.opacity = 0}>
-                                <span style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "1.2rem" }}>{item.label}</span>
-                                <Link to="/contact">
-                                    <button style={{ background: "#fd6a3d", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Commander ?</button>
-                                </Link>
+                {/* LA MOSAÏQUE DYNAMIQUE */}
+                {loading ? (
+                    <p style={{ textAlign: "center", color: muted, fontSize: "1.1rem", fontFamily: "Georgia, serif" }}>Chargement des créations de Marie...</p>
+                ) : allCroch.length === 0 ? (
+                    <p style={{ textAlign: "center", color: muted, fontSize: "1.1rem" }}>Aucune création en crochet n'a été publiée pour le moment.</p>
+                ) : (
+                    <div style={{ 
+                        display: "grid", 
+                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
+                        gridAutoRows: "200px", 
+                        gap: 24, 
+                        gridAutoFlow: "dense" 
+                    }}>
+                        {allCroch.map((item) => (
+                            <div key={item.id} style={{ 
+                                gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`, 
+                                position: "relative", 
+                                borderRadius: 24, 
+                                overflow: "hidden", 
+                                background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+                                border: `1px solid ${cardBorder}` 
+                            }}>
+                                <img src={item.img_url} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                
+                                <div style={{ 
+                                    position: "absolute", inset: 0, 
+                                    background: "rgba(13, 11, 26, 0.7)", opacity: 0, 
+                                    display: "flex", flexDirection: "column", gap: "12px",
+                                    alignItems: "center", justifyContent: "center", 
+                                    transition: "0.3s", backdropFilter: "blur(4px)"
+                                }} 
+                                onMouseEnter={e => e.currentTarget.style.opacity = 1} 
+                                onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                                    <span style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "1.2rem" }}>{item.title}</span>
+                                    <Link to="/contact">
+                                        <button style={{ background: "#fd6a3d", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Commander ?</button>
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
