@@ -111,6 +111,22 @@ export function useOeuvres() {
         return {};
     };
 
+    // Retire l'œuvre de l'affichage sans la supprimer en base (pour l'undo).
+    // Renvoie l'œuvre retirée, ou null.
+    const stashOeuvre = (id) => {
+        const item = oeuvres.find((o) => o.id === id) || null;
+        if (item) setOeuvres((list) => list.filter((it) => it.id !== id));
+        return item;
+    };
+
+    // Remet une œuvre stashée dans l'affichage (annulation).
+    const restoreOeuvre = (item) => {
+        if (!item) return;
+        setOeuvres((list) => sortByPosition([...list.filter((it) => it.id !== item.id), item]));
+    };
+
+    // Suppression réelle (base + fichier Storage). Suppose l'œuvre déjà retirée
+    // de l'affichage via stashOeuvre.
     const removeOeuvre = async (id, imgUrl) => {
         if (!supabase) return { error: new Error("Supabase non configuré.") };
 
@@ -162,6 +178,8 @@ export function useOeuvres() {
         refresh,
         addOeuvre,
         updateOeuvre,
+        stashOeuvre,
+        restoreOeuvre,
         removeOeuvre,
         reorderOeuvres,
     };

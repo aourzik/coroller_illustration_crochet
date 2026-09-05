@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useOeuvres } from "../hooks/useOeuvres";
@@ -38,9 +38,19 @@ const SORTERS = { manual: byManual, recent: byRecent, old: byOld, az: byAz, za: 
 export default function Atelier() {
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
-    const { oeuvres, loading, configError, addOeuvre, updateOeuvre, removeOeuvre, reorderOeuvres } =
-        useOeuvres();
+    const {
+        oeuvres,
+        loading,
+        configError,
+        addOeuvre,
+        updateOeuvre,
+        stashOeuvre,
+        restoreOeuvre,
+        removeOeuvre,
+        reorderOeuvres,
+    } = useOeuvres();
     const { toasts, push, dismiss } = useToasts();
+    const pendingDeletes = useRef(new Map()); // id -> timeoutId
 
     const [section, setSection] = useState("overview");
     const [isNarrow, setIsNarrow] = useState(
@@ -65,15 +75,24 @@ export default function Atelier() {
         navigate("/connexion", { replace: true });
     };
 
-    const handleAdd = async (fields) => {
-        const { error } = await addOeuvre(fields);
-        if (error) {
-            push(`Erreur : ${error.message}`, "error");
-            return false;
+    // Publication séquentielle d'un lot d'images ; `onProgress(done, total)`.
+    const handleAddBatch = async (list, onProgress) => {
+        const failed = [];
+        for (let i = 0; i < list.length; i += 1) {
+            const { error } = await addOeuvre(list[i]);
+            if (error) failed.push({ ...list[i], error });
+            onProgress?.(i + 1, list.length);
         }
-        push("Œuvre publiée sur le site.", "success");
-        setSection("overview");
-        return true;
+        const published = list.length - failed.length;
+        if (published > 0) {
+            push(`${published} œuvre${published > 1 ? "s" : ""} publiée${published > 1 ? "s" : ""}.`, "success");
+        }
+        if (failed.length > 0) {
+            push(`${failed.length} image(s) en échec : ${failed[0].error.message}`, "error");
+        } else {
+            setSection("overview");
+        }
+        return { failed };
     };
 
     const handleSave = async (id, patch, file) => {
@@ -82,10 +101,39 @@ export default function Atelier() {
         return !error;
     };
 
-    const handleDelete = async (id, imgUrl) => {
-        const { error } = await removeOeuvre(id, imgUrl);
-        push(error ? `Erreur : ${error.message}` : "Œuvre retirée du site.", error ? "error" : "success");
+    // Suppression avec fenêtre d'annulation : l'œuvre disparaît de l'affichage,
+    // la suppression réelle (base + fichier) n'a lieu qu'après 6 s sans « Annuler ».
+    const handleDelete = (id, imgUrl) => {
+        const item = stashOeuvre(id);
+        if (!item) return;
+        const timer = setTimeout(async () => {
+            pendingDeletes.current.delete(id);
+            const { error } = await removeOeuvre(id, imgUrl);
+            if (error) {
+                restoreOeuvre(item);
+                push(`Erreur : ${error.message}`, "error");
+            }
+        }, 6000);
+        pendingDeletes.current.set(id, timer);
+        push("Œuvre retirée du site.", "info", {
+            duration: 6000,
+            action: {
+                label: "Annuler",
+                onClick: () => {
+                    clearTimeout(timer);
+                    pendingDeletes.current.delete(id);
+                    restoreOeuvre(item);
+                },
+            },
+        });
     };
+
+    // Au démontage (déconnexion, navigation…), on annule les suppressions encore
+    // en attente : l'œuvre réapparaîtra au prochain chargement (choix prudent).
+    useEffect(() => {
+        const map = pendingDeletes.current;
+        return () => map.forEach(clearTimeout);
+    }, []);
 
     const handleReorder = async (orderedIds) => {
         const { error } = await reorderOeuvres(orderedIds);
@@ -162,7 +210,7 @@ export default function Atelier() {
                     )}
 
                     {section === "add" ? (
-                        <UploadForm onSubmit={handleAdd} onCancel={() => setSection("overview")} />
+                        <UploadForm onSubmit={handleAddBatch} onCancel={() => setSection("overview")} />
                     ) : (
                         <>
                             <Toolbar

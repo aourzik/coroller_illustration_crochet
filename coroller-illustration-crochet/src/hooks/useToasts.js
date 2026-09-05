@@ -1,20 +1,33 @@
 import { useCallback, useRef, useState } from "react";
 
-// File d'attente de notifications éphémères (auto-disparition après 4 s).
-// tone : "info" | "success" | "error".
+// File d'attente de notifications éphémères.
+// push(message, tone?, options?)
+//   tone    : "info" | "success" | "error"
+//   options : { duration?: ms, action?: { label, onClick } }
 export function useToasts() {
     const [toasts, setToasts] = useState([]);
     const nextId = useRef(1);
+    const timers = useRef(new Map());
 
     const dismiss = useCallback((id) => {
-        setToasts((list) => list.filter((t) => t.id !== id));
+        const t = timers.current.get(id);
+        if (t) {
+            clearTimeout(t);
+            timers.current.delete(id);
+        }
+        setToasts((list) => list.filter((toast) => toast.id !== id));
     }, []);
 
     const push = useCallback(
-        (message, tone = "info") => {
+        (message, tone = "info", options = {}) => {
             const id = nextId.current++;
-            setToasts((list) => [...list, { id, message, tone }]);
-            setTimeout(() => dismiss(id), 4000);
+            const duration = options.duration ?? 4000;
+            setToasts((list) => [...list, { id, message, tone, action: options.action }]);
+            timers.current.set(
+                id,
+                setTimeout(() => dismiss(id), duration)
+            );
+            return id;
         },
         [dismiss]
     );

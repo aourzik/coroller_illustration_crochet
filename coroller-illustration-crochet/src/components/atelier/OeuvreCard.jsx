@@ -10,6 +10,7 @@ import {
     SIZE_LABEL,
 } from "./theme";
 import Icon from "./Icon";
+import ImageCropper from "./ImageCropper";
 
 // Une carte de la grille. Modes : "view" | "edit" | "confirm".
 // Props de réordonnancement (optionnelles) : reorderable, dragHandleProps, isDragging.
@@ -25,6 +26,7 @@ export default function OeuvreCard({
     const [form, setForm] = useState({ title: oeuvre.title, category: oeuvre.category, size: oeuvre.size });
     const [newFile, setNewFile] = useState(null);
     const [newPreview, setNewPreview] = useState(null);
+    const [cropping, setCropping] = useState(false);
     const [busy, setBusy] = useState(false);
     const fileRef = useRef(null);
 
@@ -67,11 +69,8 @@ export default function OeuvreCard({
         }
     };
 
-    const remove = async () => {
-        setBusy(true);
-        await onDelete(oeuvre.id, oeuvre.img_url);
-        setBusy(false);
-    };
+    // Retrait instantané côté affichage (l'undo est géré par un toast du parent).
+    const remove = () => onDelete(oeuvre.id, oeuvre.img_url);
 
     return (
         <div
@@ -138,12 +137,11 @@ export default function OeuvreCard({
                         <div style={{ display: "flex", gap: 8 }}>
                             <button
                                 onClick={remove}
-                                disabled={busy}
-                                style={{ ...btnDanger, background: COLORS.danger, color: "#fff", opacity: busy ? 0.7 : 1 }}
+                                style={{ ...btnDanger, background: COLORS.danger, color: "#fff" }}
                             >
-                                {busy ? "Suppression…" : "Oui, supprimer"}
+                                Oui, supprimer
                             </button>
-                            <button onClick={() => setMode("view")} disabled={busy} style={btnGhost}>
+                            <button onClick={() => setMode("view")} style={btnGhost}>
                                 Annuler
                             </button>
                         </div>
@@ -179,14 +177,22 @@ export default function OeuvreCard({
                             </select>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => fileRef.current?.click()}
-                            style={{ ...btnGhost, alignSelf: "flex-start" }}
-                        >
-                            <Icon name="image" size={14} />
-                            {newFile ? "Changer l'image choisie" : "Remplacer l'image"}
-                        </button>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            <button
+                                type="button"
+                                onClick={() => fileRef.current?.click()}
+                                style={btnGhost}
+                            >
+                                <Icon name="image" size={14} />
+                                {newFile ? "Changer l'image" : "Remplacer l'image"}
+                            </button>
+                            {newFile && (
+                                <button type="button" onClick={() => setCropping(true)} style={btnGhost}>
+                                    <Icon name="crop" size={14} />
+                                    Recadrer
+                                </button>
+                            )}
+                        </div>
                         <input
                             ref={fileRef}
                             type="file"
@@ -229,6 +235,17 @@ export default function OeuvreCard({
                     </>
                 )}
             </div>
+
+            {cropping && newFile && (
+                <ImageCropper
+                    file={newFile}
+                    onCancel={() => setCropping(false)}
+                    onDone={(cropped) => {
+                        setNewFile(cropped);
+                        setCropping(false);
+                    }}
+                />
+            )}
         </div>
     );
 }
