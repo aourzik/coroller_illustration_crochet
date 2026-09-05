@@ -18,10 +18,18 @@ export default function GalerieCrochet({ dark }) {
                 const { data, error } = await supabase
                     .from("oeuvres")
                     .select("*")
-                    .eq("category", "crochet"); 
+                    .eq("category", "crochet")
+                    .order("created_at", { ascending: false });
 
                 if (error) throw error;
-                if (data) setAllCroch(data);
+                if (data) {
+                    const ordered = [...data].sort(
+                        (a, b) =>
+                            (a.position ?? Number.POSITIVE_INFINITY) -
+                            (b.position ?? Number.POSITIVE_INFINITY)
+                    );
+                    setAllCroch(ordered);
+                }
             } catch (error) {
                 console.error("Erreur lors de la récupération du crochet :", error);
             } finally {

@@ -18,10 +18,20 @@ export default function GalerieIllustrations({ dark }) {
                 const { data, error } = await supabase
                     .from("oeuvres")
                     .select("*")
-                    .eq("category", "illustration"); // 🎯 Filtre uniquement sur la catégorie illustration
+                    .eq("category", "illustration") // 🎯 Filtre uniquement sur la catégorie illustration
+                    .order("created_at", { ascending: false });
 
                 if (error) throw error;
-                if (data) setAllIllus(data);
+                if (data) {
+                    // Ordre défini par l'atelier si la colonne `position` existe,
+                    // sinon on garde l'ordre par date.
+                    const ordered = [...data].sort(
+                        (a, b) =>
+                            (a.position ?? Number.POSITIVE_INFINITY) -
+                            (b.position ?? Number.POSITIVE_INFINITY)
+                    );
+                    setAllIllus(ordered);
+                }
             } catch (error) {
                 console.error("Erreur lors de la récupération des illustrations :", error);
             } finally {

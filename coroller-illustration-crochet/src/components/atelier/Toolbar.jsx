@@ -2,6 +2,7 @@ import { COLORS, field, selectField } from "./theme";
 import Icon from "./Icon";
 
 const SORT_OPTIONS = [
+    { value: "manual", label: "Ordre manuel" },
     { value: "recent", label: "Plus récentes" },
     { value: "old", label: "Plus anciennes" },
     { value: "az", label: "Titre A → Z" },

@@ -27,16 +27,19 @@ const SECTION_TITLE = {
     add: "Ajouter une œuvre",
 };
 
+const byManual = (a, b) =>
+    (a.position ?? Number.POSITIVE_INFINITY) - (b.position ?? Number.POSITIVE_INFINITY);
 const byRecent = (a, b) => new Date(b.created_at) - new Date(a.created_at);
 const byOld = (a, b) => new Date(a.created_at) - new Date(b.created_at);
 const byAz = (a, b) => a.title.localeCompare(b.title, "fr");
 const byZa = (a, b) => b.title.localeCompare(a.title, "fr");
-const SORTERS = { recent: byRecent, old: byOld, az: byAz, za: byZa };
+const SORTERS = { manual: byManual, recent: byRecent, old: byOld, az: byAz, za: byZa };
 
 export default function Atelier() {
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
-    const { oeuvres, loading, configError, addOeuvre, updateOeuvre, removeOeuvre } = useOeuvres();
+    const { oeuvres, loading, configError, addOeuvre, updateOeuvre, removeOeuvre, reorderOeuvres } =
+        useOeuvres();
     const { toasts, push, dismiss } = useToasts();
 
     const [section, setSection] = useState("overview");
@@ -44,7 +47,7 @@ export default function Atelier() {
         typeof window !== "undefined" && window.innerWidth < 900
     );
     const [query, setQuery] = useState("");
-    const [sort, setSort] = useState("recent");
+    const [sort, setSort] = useState("manual");
     const [category, setCategory] = useState("all");
 
     useEffect(() => {
@@ -73,8 +76,8 @@ export default function Atelier() {
         return true;
     };
 
-    const handleSave = async (id, patch) => {
-        const { error } = await updateOeuvre(id, patch);
+    const handleSave = async (id, patch, file) => {
+        const { error } = await updateOeuvre(id, patch, file);
         push(error ? `Erreur : ${error.message}` : "Modifications enregistrées.", error ? "error" : "success");
         return !error;
     };
@@ -82,6 +85,11 @@ export default function Atelier() {
     const handleDelete = async (id, imgUrl) => {
         const { error } = await removeOeuvre(id, imgUrl);
         push(error ? `Erreur : ${error.message}` : "Œuvre retirée du site.", error ? "error" : "success");
+    };
+
+    const handleReorder = async (orderedIds) => {
+        const { error } = await reorderOeuvres(orderedIds);
+        if (error) push(`Erreur : ${error.message}`, "error");
     };
 
     const sectionCategory =
@@ -95,8 +103,12 @@ export default function Atelier() {
         const q = query.trim().toLowerCase();
         if (q) list = list.filter((o) => o.title.toLowerCase().includes(q));
 
-        return [...list].sort(SORTERS[sort] || byRecent);
+        return [...list].sort(SORTERS[sort] || byManual);
     }, [oeuvres, sectionCategory, category, query, sort]);
+
+    // Glisser-déposer possible seulement dans une section catégorie, en tri
+    // manuel et sans recherche en cours (sinon l'ordre affiché ≠ ordre réel).
+    const reorderable = Boolean(sectionCategory) && sort === "manual" && !query.trim();
 
     return (
         <div
@@ -163,6 +175,12 @@ export default function Atelier() {
                                 showCategory={section === "overview"}
                                 count={visible.length}
                             />
+                            {reorderable && visible.length > 1 && (
+                                <p style={{ fontSize: 12.5, color: COLORS.muted, margin: "0 0 12px" }}>
+                                    Glisse une vignette par sa poignée pour changer l'ordre d'affichage
+                                    sur le site.
+                                </p>
+                            )}
                             {loading ? (
                                 <p style={{ color: COLORS.muted, fontSize: 14 }}>Chargement…</p>
                             ) : (
@@ -170,6 +188,8 @@ export default function Atelier() {
                                     oeuvres={visible}
                                     onSave={handleSave}
                                     onDelete={handleDelete}
+                                    reorderable={reorderable}
+                                    onReorder={handleReorder}
                                     emptyLabel={
                                         query.trim()
                                             ? "Aucune œuvre ne correspond à ta recherche."

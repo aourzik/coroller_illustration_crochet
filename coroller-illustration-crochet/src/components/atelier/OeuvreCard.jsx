@@ -1,33 +1,75 @@
-import { useState } from "react";
-import { COLORS, field, btnPrimary, btnGhost, btnDanger, categoryBadge, CATEGORY_LABEL, SIZE_LABEL } from "./theme";
+import { useEffect, useRef, useState } from "react";
+import {
+    COLORS,
+    field,
+    btnPrimary,
+    btnGhost,
+    btnDanger,
+    categoryBadge,
+    CATEGORY_LABEL,
+    SIZE_LABEL,
+} from "./theme";
 import Icon from "./Icon";
 
-// Une carte de la grille. Gère ses propres modes : "view" | "edit" | "confirm".
-export default function OeuvreCard({ oeuvre, onSave, onDelete }) {
+// Une carte de la grille. Modes : "view" | "edit" | "confirm".
+// Props de réordonnancement (optionnelles) : reorderable, dragHandleProps, isDragging.
+export default function OeuvreCard({
+    oeuvre,
+    onSave,
+    onDelete,
+    reorderable = false,
+    dragHandleProps,
+    isDragging = false,
+}) {
     const [mode, setMode] = useState("view");
     const [form, setForm] = useState({ title: oeuvre.title, category: oeuvre.category, size: oeuvre.size });
+    const [newFile, setNewFile] = useState(null);
+    const [newPreview, setNewPreview] = useState(null);
     const [busy, setBusy] = useState(false);
+    const fileRef = useRef(null);
+
+    useEffect(() => {
+        if (!newFile) {
+            setNewPreview(null);
+            return;
+        }
+        const url = URL.createObjectURL(newFile);
+        setNewPreview(url);
+        return () => URL.revokeObjectURL(url);
+    }, [newFile]);
 
     const startEdit = () => {
         setForm({ title: oeuvre.title, category: oeuvre.category, size: oeuvre.size });
+        setNewFile(null);
         setMode("edit");
+    };
+
+    const cancelEdit = () => {
+        setNewFile(null);
+        setMode("view");
     };
 
     const save = async () => {
         setBusy(true);
-        const ok = await onSave(oeuvre.id, {
-            title: form.title.trim() || oeuvre.title,
-            category: form.category,
-            size: form.size,
-        });
+        const ok = await onSave(
+            oeuvre.id,
+            {
+                title: form.title.trim() || oeuvre.title,
+                category: form.category,
+                size: form.size,
+            },
+            newFile || undefined
+        );
         setBusy(false);
-        if (ok) setMode("view");
+        if (ok) {
+            setNewFile(null);
+            setMode("view");
+        }
     };
 
     const remove = async () => {
         setBusy(true);
         await onDelete(oeuvre.id, oeuvre.img_url);
-        // en cas de succès la carte est retirée de la liste par le parent
         setBusy(false);
     };
 
@@ -40,15 +82,41 @@ export default function OeuvreCard({ oeuvre, onSave, onDelete }) {
                 overflow: "hidden",
                 display: "flex",
                 flexDirection: "column",
+                opacity: isDragging ? 0.4 : 1,
+                transition: "opacity .15s",
             }}
         >
             <div style={{ position: "relative", aspectRatio: "4 / 3", background: COLORS.paper }}>
                 <img
-                    src={oeuvre.img_url}
+                    src={newPreview || oeuvre.img_url}
                     alt={oeuvre.title}
                     loading="lazy"
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
+
+                {reorderable && mode === "view" && (
+                    <div
+                        {...dragHandleProps}
+                        title="Glisser pour réordonner"
+                        style={{
+                            position: "absolute",
+                            top: 8,
+                            left: 8,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 30,
+                            height: 30,
+                            borderRadius: 8,
+                            background: "rgba(13,11,26,0.55)",
+                            color: "#fff",
+                            cursor: "grab",
+                        }}
+                    >
+                        <Icon name="drag" size={16} />
+                    </div>
+                )}
+
                 {mode === "confirm" && (
                     <div
                         style={{
@@ -110,17 +178,36 @@ export default function OeuvreCard({ oeuvre, onSave, onDelete }) {
                                 <option value="large">Grand</option>
                             </select>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => fileRef.current?.click()}
+                            style={{ ...btnGhost, alignSelf: "flex-start" }}
+                        >
+                            <Icon name="image" size={14} />
+                            {newFile ? "Changer l'image choisie" : "Remplacer l'image"}
+                        </button>
+                        <input
+                            ref={fileRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setNewFile(e.target.files[0] || null)}
+                            style={{ display: "none" }}
+                        />
+                        {newFile && (
+                            <span style={{ fontSize: 11.5, color: COLORS.muted }}>
+                                Nouvelle image : {newFile.name}
+                            </span>
+                        )}
+
                         <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
                             <button onClick={save} disabled={busy} style={{ ...btnPrimary, opacity: busy ? 0.7 : 1 }}>
                                 {busy ? "…" : "Enregistrer"}
                             </button>
-                            <button onClick={() => setMode("view")} disabled={busy} style={btnGhost}>
+                            <button onClick={cancelEdit} disabled={busy} style={btnGhost}>
                                 Annuler
                             </button>
                         </div>
-                        <p style={{ fontSize: 11.5, color: COLORS.muted, margin: 0 }}>
-                            Pour changer l'image : supprime l'œuvre et publie-la à nouveau.
-                        </p>
                     </>
                 ) : (
                     <>
