@@ -10,6 +10,7 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import Modal from "./components/Modal";
 import RequireAuth from "./components/RequireAuth";
+import HeroReveal from "./components/HeroReveal";
 import GalerieIllustrations from "./pages/GalerieIllustrations";
 import GalerieCrochet from "./pages/GalerieCrochet";
 import PageContact from "./pages/PageContact";
@@ -257,7 +258,7 @@ export default function App() {
                         {/* HERO */}
                         <section id="hero" style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", zIndex: 1, overflow: "hidden" }}>
                             <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.6, pointerEvents: "none" }}>
-                                <iframe src="https://my.spline.design/maskimagerevealcopycopy-tjKszRnI28NNBDPRI65AaOth-eLk/" frameBorder="0" width="100%" height="120%" style={{ transform: "scale(1.1)", filter: dark ? "brightness(0.8) contrast(1.2)" : "none" }}></iframe>
+                                <HeroReveal dark={dark} />
                             </div>
                             <div style={{ position: "relative", zIndex: 1, maxWidth: 780 }}>
                                 <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 32, padding: "8px 20px", borderRadius: 99, border: `1px solid ${cardBorder}`, background: cardBg }}>
