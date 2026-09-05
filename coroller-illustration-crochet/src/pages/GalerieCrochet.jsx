@@ -10,6 +10,10 @@ export default function GalerieCrochet({ dark }) {
 
     useEffect(() => {
         async function fetchCrochets() {
+            if (!supabase) {
+                setLoading(false);
+                return;
+            }
             try {
                 const { data, error } = await supabase
                     .from("oeuvres")

@@ -15,9 +15,7 @@ export default function Footer({ divider, txt, muted }) {
                             Coroller Illustration & Crochet
                         </span>
                         <span style={{ color: muted, fontSize: 12 }}>
-                            © 2026 · Fait avec passion à Albi par Aïny Ourzik
-                            {/* 🔥 LE LIEN SECRET EST CACHÉ SUR CE POINT FINAL ! */}
-                            <Link to="/marie-admin" style={{ color: "inherit", textDecoration: "none", cursor: "default" }}>.</Link>
+                            © 2026 · Fait avec passion à Albi par Aïny Ourzik.
                         </span>
                     </div>
                 </div>

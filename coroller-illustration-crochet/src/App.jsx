@@ -1,20 +1,22 @@
 import { useState, useEffect, useRef } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 
 // --- IMPORTS ASSETS ---
 import mariePhoto from "./assets/images/marie.jpg";
 import logo from "./assets/images/logo.png";
 
 // --- IMPORTS COMPOSANTS ET PAGES ---
-import DashboardAdmin from "./pages/DashboardAdmin";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import Modal from "./components/Modal";
+import RequireAuth from "./components/RequireAuth";
 import GalerieIllustrations from "./pages/GalerieIllustrations";
 import GalerieCrochet from "./pages/GalerieCrochet";
 import PageContact from "./pages/PageContact";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
+import Connexion from "./pages/Connexion";
+import Atelier from "./pages/Atelier";
 
 export const C = {
     ink: "#0d0b1a",
@@ -157,6 +159,10 @@ export default function App() {
     const [scrolled, setScrolled] = useState(false);
     const { pathname } = useLocation();
 
+    // Les routes "back-office" (login + atelier) s'affichent sans le Nav/Footer
+    // ni les bulles d'ambiance du site public.
+    const isBareRoute = pathname === "/connexion" || pathname.startsWith("/atelier");
+
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -227,17 +233,19 @@ export default function App() {
     return (
         <div style={{ background: bg, color: txt, fontFamily: "Corbel, sans-serif", minHeight: "100vh", transition: "all .5s", position: "relative", overflowX: "hidden" }}>
 
-            <Nav
-                dark={dark}
-                setDark={setDark}
-                scrolled={scrolled}
-                txt={txt}
-                muted={muted}
-                C={C}
-                cardBg={cardBg}
-                cardBorder={cardBorder}
-                divider={divider}
-            />
+            {!isBareRoute && (
+                <Nav
+                    dark={dark}
+                    setDark={setDark}
+                    scrolled={scrolled}
+                    txt={txt}
+                    muted={muted}
+                    C={C}
+                    cardBg={cardBg}
+                    cardBorder={cardBorder}
+                    divider={divider}
+                />
+            )}
 
             <Routes>
                 <Route path="/" element={
@@ -390,12 +398,24 @@ export default function App() {
                 <Route path="/contact" element={<PageContact dark={dark} />} />
                 <Route path="/mentions-legales" element={<MentionsLegales dark={dark} />} />
                 <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite dark={dark} />} />
-                <Route path="/marie-admin" element={<DashboardAdmin dark={dark} />} />
+
+                {/* Back-office */}
+                <Route path="/connexion" element={<Connexion />} />
+                <Route
+                    path="/atelier"
+                    element={
+                        <RequireAuth>
+                            <Atelier />
+                        </RequireAuth>
+                    }
+                />
+                {/* Ancien chemin : on redirige vers le nouveau */}
+                <Route path="/marie-admin" element={<Navigate to="/atelier" replace />} />
             </Routes>
 
-            <Footer divider={divider} txt={txt} muted={muted} logo={logo} />
+            {!isBareRoute && <Footer divider={divider} txt={txt} muted={muted} logo={logo} />}
 
-            {modal && <Modal onClose={() => setModal(false)} dark={dark} />}
+            {modal && !isBareRoute && <Modal onClose={() => setModal(false)} dark={dark} />}
         </div>
     );
 }

@@ -10,6 +10,10 @@ export default function GalerieIllustrations({ dark }) {
 
     useEffect(() => {
         async function fetchIllustrations() {
+            if (!supabase) {
+                setLoading(false);
+                return;
+            }
             try {
                 const { data, error } = await supabase
                     .from("oeuvres")

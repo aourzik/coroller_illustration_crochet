@@ -1,0 +1,11 @@
+# SPA fallback (Apache / Hostinger) : toutes les URL inconnues renvoient
+# index.html pour que le routage React fonctionne au rafraîchissement
+# (ex : /atelier, /connexion, /galerie-illustrations).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
