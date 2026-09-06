@@ -156,7 +156,7 @@ function Carousel({ items, dark }) {
 }
 
 export default function App() {
-    const [dark, setDark] = useState(true);
+    const [dark, setDark] = useState(false);
     const [modal, setModal] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const { pathname } = useLocation();
@@ -276,19 +276,15 @@ export default function App() {
                                 <HeroReveal dark={dark} />
                             </div>
                             <div style={{ position: "relative", zIndex: 1, maxWidth: 780 }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 32, padding: "8px 20px", borderRadius: 99, border: `1px solid ${cardBorder}`, background: cardBg }}>
-                                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent }} />
-                                    <Tag label="Illustration · Crochet" />
-                                </div>
                                 <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2.6rem,8vw,6rem)", fontWeight: 400, lineHeight: 1.05, margin: "0 0 28px", letterSpacing: -1, color: txt, textShadow: "0 10px 30px rgba(59, 59, 59, 0.5)" }}>
                                     Des créations authentiques<br /><span style={{
-                                        color: "#7a9cd6",
+                                        color: dark ? "#7a9cd6" : C.accent,
                                         transition: "color .5s ease"
                                     }}>
                                         pour tous·tes.
                                     </span>
                                 </h1>
-                                <p style={{ fontSize: "clamp(1rem,2vw,1.2rem)", color: muted, maxWidth: 480, margin: "0 auto 44px", lineHeight: 1.8, fontWeight: 400 }}>
+                                <p style={{ fontSize: "clamp(1rem,2vw,1.2rem)", color: dark ? "#fff" : "#0d0b1a", maxWidth: 480, margin: "0 auto 44px", lineHeight: 1.8, fontWeight: 400 }}>
                                     Je dessine et crochète dans un univers doux et fantaisie. Bienvenue ici,  pour découvrir ce que je crée.
                                 </p>
                                 <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
