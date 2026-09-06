@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 
 const IMG = "/site_accueil.jpg";
 
-// --- Réglages faciles à ajuster ---
-const CARDS = 7; // nombre de cartes verticales
+// --- Réglages faciles à ajuster (desktop / mobile) ---
+const CARDS_DESKTOP = 7;
+const CARDS_MOBILE = 4;
 const CARD_HEIGHT = 62; // % de la hauteur du hero
-const CARD_MAX_WIDTH = 190; // px
-const SIDE_PADDING = "6%"; // marge gauche/droite du cluster
+const CARD_MAX_WIDTH_DESKTOP = 190; // px
+const CARD_MAX_WIDTH_MOBILE = 120; // px
+const SIDE_PADDING_DESKTOP = "6%";
+const SIDE_PADDING_MOBILE = "4%";
 const GAP = "2.4%"; // espace entre les cartes
 const RADIUS = 20; // arrondi des cartes
 const STAGGER = 0.14; // s entre chaque carte à l'ouverture
@@ -23,9 +27,14 @@ const prefersReducedMotion = () =>
 // décalées, séparées par des espaces. Elles montent en cascade au chargement,
 // puis dérivent doucement avec la souris. Remplace l'embed Spline. Zéro dépendance.
 export default function HeroReveal({ dark }) {
+    const { isMobile } = useBreakpoint();
     const reduce = prefersReducedMotion();
     const [revealed, setRevealed] = useState(reduce);
     const [mouse, setMouse] = useState({ x: 0, y: 0 }); // -1 → 1
+
+    const CARDS = isMobile ? CARDS_MOBILE : CARDS_DESKTOP;
+    const CARD_MAX_WIDTH = isMobile ? CARD_MAX_WIDTH_MOBILE : CARD_MAX_WIDTH_DESKTOP;
+    const SIDE_PADDING = isMobile ? SIDE_PADDING_MOBILE : SIDE_PADDING_DESKTOP;
 
     useEffect(() => {
         if (reduce) return undefined;

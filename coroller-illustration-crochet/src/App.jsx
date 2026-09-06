@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import { useBreakpoint } from "./hooks/useBreakpoint";
 
 // --- IMPORTS ASSETS ---
 import mariePhoto from "./assets/images/marie.jpg";
@@ -107,7 +108,7 @@ function Carousel({ items, dark }) {
 
     return (
         <div style={{ width: "100%", userSelect: "none" }}>
-            <div style={{ position: "relative", height: 500, overflow: "hidden", borderRadius: 24 }}>
+            <div style={{ position: "relative", height: "clamp(300px, 56vw, 500px)", overflow: "hidden", borderRadius: 24 }}>
                 {items.map((item, i) => {
                     const offset = ((i - cur + n) % n);
                     const pos = offset <= n / 2 ? offset : offset - n;
@@ -159,10 +160,24 @@ export default function App() {
     const [modal, setModal] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const { pathname } = useLocation();
+    const { isMobile, isTablet } = useBreakpoint();
 
     // Les routes "back-office" (login + atelier) s'affichent sans le Nav/Footer
     // ni les bulles d'ambiance du site public.
     const isBareRoute = pathname === "/connexion" || pathname.startsWith("/atelier");
+
+    // Sections de la home en deux colonnes → une seule colonne sous 900 px.
+    const twoColSection = {
+        maxWidth: 1600,
+        margin: "0 auto",
+        padding: isMobile ? "56px 20px" : "100px 40px",
+        display: "grid",
+        gridTemplateColumns: isTablet ? "1fr" : "1fr 1fr",
+        gap: isTablet ? 44 : 80,
+        alignItems: "center",
+        position: "relative",
+        zIndex: 2,
+    };
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -256,7 +271,7 @@ export default function App() {
                         <div style={{ position: "absolute", top: "10%", right: "-10%", width: "60vw", height: "60vw", borderRadius: "50%", background: dark ? "radial-gradient(circle, rgba(253,106,61,0.15) 0%, transparent 75%)" : `radial-gradient(circle, ${C.accent} 0%, transparent 70%)`, filter: "blur(110px)", opacity: dark ? 0.8 : 0.5, pointerEvents: "none", zIndex: 0 }} />
 
                         {/* HERO */}
-                        <section id="hero" style={{ height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "80px 40px", position: "relative", zIndex: 1, overflow: "hidden" }}>
+                        <section id="hero" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: isMobile ? "96px 20px 72px" : "80px 40px", position: "relative", zIndex: 1, overflow: "hidden" }}>
                             <div style={{ position: "absolute", inset: 0, zIndex: -1, opacity: 0.6, pointerEvents: "none" }}>
                                 <HeroReveal dark={dark} />
                             </div>
@@ -265,7 +280,7 @@ export default function App() {
                                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent }} />
                                     <Tag label="Illustration · Crochet" />
                                 </div>
-                                <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(3.5rem,8vw,6rem)", fontWeight: 400, lineHeight: 1.0, margin: "0 0 28px", letterSpacing: -1, color: txt, textShadow: "0 10px 30px rgba(59, 59, 59, 0.5)" }}>
+                                <h1 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2.6rem,8vw,6rem)", fontWeight: 400, lineHeight: 1.05, margin: "0 0 28px", letterSpacing: -1, color: txt, textShadow: "0 10px 30px rgba(59, 59, 59, 0.5)" }}>
                                     Des créations authentiques<br /><span style={{
                                         color: "#7a9cd6",
                                         transition: "color .5s ease"
@@ -285,7 +300,7 @@ export default function App() {
                         </section>
 
                         {/* À PROPOS */}
-                        <section id="a-propos" className="reveal" style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 2 }}>
+                        <section id="a-propos" className="reveal" style={twoColSection}>
                             <div style={{ position: "relative", justifySelf: "center", width: "100%", maxWidth: "500px" }}>
                                 <div style={{ aspectRatio: "4/5", borderRadius: 24, background: dark ? "#1a1840" : "#d5e4f9", overflow: "hidden", border: `1px solid ${cardBorder}` }}>
                                     <img src={mariePhoto} alt="Portrait" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -325,7 +340,7 @@ export default function App() {
                         </section>
 
                         {/* ILLUSTRATIONS */}
-                        <section id="illustrations" className="reveal" style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 2 }}>
+                        <section id="illustrations" className="reveal" style={twoColSection}>
                             <Carousel items={illus} dark={dark} />
                             <div>
                                 <Tag label="Illustrations" />
@@ -346,7 +361,7 @@ export default function App() {
                         </section>
 
                         {/* CROCHET */}
-                        <section id="crochet" className="reveal" style={{ maxWidth: 1600, margin: "0 auto", padding: "100px 40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 2 }}>
+                        <section id="crochet" className="reveal" style={twoColSection}>
                             <div>
                                 <Tag label="Créations crochet" />
                                 <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 400, margin: "16px 0 24px", lineHeight: 1.15, color: txt }}>
@@ -367,13 +382,13 @@ export default function App() {
                         </section>
 
                         {/* CONTACT CTA */}
-                        <section id="contact" className="reveal" style={{ padding: "0 40px 100px", position: "relative", zIndex: 2 }}>
+                        <section id="contact" className="reveal" style={{ padding: isMobile ? "0 20px 64px" : "0 40px 100px", position: "relative", zIndex: 2 }}>
                             <div style={{
                                 maxWidth: 1600, margin: "0 auto",
                                 background: dark ? "linear-gradient(135deg,#1a1640 0%,#2a204a 50%,#1a1030 100%)" : "linear-gradient(135deg, #92bbf3 0%, #b8d4ff 50%, #d4e6ff 100%)",
-                                borderRadius: 28, padding: "80px 64px",
+                                borderRadius: 28, padding: isMobile ? "40px 24px" : "80px 64px",
                                 border: `1px solid ${dark ? "rgba(255,255,255,0.07)" : "rgba(79,71,144,0.12)"}`,
-                                display: "grid", gridTemplateColumns: "1fr auto", gap: 48, alignItems: "center",
+                                display: "grid", gridTemplateColumns: isTablet ? "1fr" : "1fr auto", gap: isTablet ? 28 : 48, alignItems: "center",
                             }}>
                                 <div>
                                     <Tag label="Collaboration" />
@@ -384,7 +399,7 @@ export default function App() {
                                         Si mes créations correspondent à une idée, un projet que tu voudrais réaliser n'hésite pas à me contacter pour en discuter !
                                     </p>
                                 </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-end" }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: isTablet ? "flex-start" : "flex-end" }}>
                                     <CTABtn onClick={() => setModal(true)}>Travaillons ensemble →</CTABtn>
                                     <span style={{ fontSize: 12, color: muted, letterSpacing: 0.5 }}>Réponse sous 48h garantie</span>
                                 </div>

@@ -43,8 +43,8 @@ export default function PageContact({ dark }) {
 
     return (
         <div style={{
-            paddingTop: "140px",
-            paddingBottom: "100px",
+            paddingTop: "clamp(110px, 22vw, 140px)",
+            paddingBottom: "clamp(64px, 12vw, 100px)",
             minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
@@ -63,8 +63,8 @@ export default function PageContact({ dark }) {
 
             <div style={{
                 background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                padding: "48px",
-                borderRadius: "32px",
+                padding: "clamp(24px, 6vw, 48px)",
+                borderRadius: "clamp(20px, 5vw, 32px)",
                 width: "100%",
                 maxWidth: "550px",
                 border: `1px solid ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"}`

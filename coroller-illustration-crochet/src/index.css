@@ -17,6 +17,21 @@ body {
   box-sizing: border-box;
 }
 
+/* Confort mobile : pas d'auto-zoom du texte sur iOS, images fluides,
+   pas de débordement horizontal de la page */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 /* S'assure que React prend toute la place */
 #root {
   width: 100%;

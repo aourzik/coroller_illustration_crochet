@@ -4,8 +4,8 @@ import React from "react";
 
 export default function Footer({ divider, txt, muted }) {
     return (
-        <footer style={{ borderTop: `1px solid ${divider}`, padding: "60px 40px" }}>
-            <div style={{ maxWidth: 1600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 40 }}>
+        <footer style={{ borderTop: `1px solid ${divider}`, padding: "clamp(40px, 8vw, 60px) clamp(20px, 5vw, 40px)" }}>
+            <div style={{ maxWidth: 1600, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 28 }}>
 
                 {/* IDENTITÉ AVEC LOGO */}
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

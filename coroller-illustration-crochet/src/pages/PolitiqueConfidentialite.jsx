@@ -7,7 +7,7 @@ export default function PolitiqueConfidentialite({ dark }) {
 
     return (
         <div style={{ 
-            paddingTop: "140px", 
+            paddingTop: "clamp(110px, 22vw, 140px)", 
             paddingBottom: "100px",
             minHeight: "100vh", 
             maxWidth: "100vw",

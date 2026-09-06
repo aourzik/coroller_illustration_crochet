@@ -103,11 +103,11 @@ export default function GalerieCrochet({ dark }) {
             <div style={{ 
                 position: "relative", 
                 zIndex: 1,
-                maxWidth: 1600, margin: "0 auto", padding: "140px 40px 100px" 
+                maxWidth: 1600, margin: "0 auto", padding: "clamp(108px, 20vw, 140px) clamp(16px, 5vw, 40px) 100px"
             }}>
                 
                 {/* EN-TÊTE DE LA PAGE */}
-                <div style={{ maxWidth: 800, margin: "0 auto 80px", textAlign: "center" }}>
+                <div style={{ maxWidth: 800, margin: "0 auto clamp(48px, 10vw, 80px)", textAlign: "center" }}>
                     <h1 style={{ 
                         fontFamily: "Georgia,serif", 
                         fontSize: "clamp(3.5rem,8vw,4.5rem)", 
@@ -144,8 +144,8 @@ export default function GalerieCrochet({ dark }) {
                 ) : (
                     <div style={{ 
                         display: "grid", 
-                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
-                        gridAutoRows: "200px", 
+                        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 240px), 1fr))",
+                        gridAutoRows: "clamp(150px, 42vw, 200px)", 
                         gap: 24, 
                         gridAutoFlow: "dense" 
                     }}>
