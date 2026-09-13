@@ -99,6 +99,22 @@ export default function Icon({ name, size = 16 }) {
                     <path d="M18 22V8a2 2 0 0 0-2-2H2" />
                 </svg>
             );
+        case "store":
+            return (
+                <svg {...p}>
+                    <path d="M3 9l1.5-5.5A2 2 0 0 1 6.4 2h11.2a2 2 0 0 1 1.9 1.5L21 9" />
+                    <path d="M3 9a2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 0 2 2 2 2 0 0 0 2-2" />
+                    <path d="M4 11v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8" />
+                    <path d="M9 21v-5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v5" />
+                </svg>
+            );
+        case "map-pin":
+            return (
+                <svg {...p}>
+                    <path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                </svg>
+            );
         default:
             return null;
     }

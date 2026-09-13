@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useOeuvres } from "../hooks/useOeuvres";
+import { useBoutiqueInfo } from "../hooks/useBoutiqueInfo";
+import { useLieux } from "../hooks/useLieux";
 import { useToasts } from "../hooks/useToasts";
 import { COLORS, btnPrimary } from "../components/atelier/theme";
 import Icon from "../components/atelier/Icon";
@@ -11,12 +13,16 @@ import StatsRow from "../components/atelier/StatsRow";
 import Toolbar from "../components/atelier/Toolbar";
 import OeuvreGrid from "../components/atelier/OeuvreGrid";
 import UploadForm from "../components/atelier/UploadForm";
+import BoutiqueForm from "../components/atelier/BoutiqueForm";
+import LieuUploadForm from "../components/atelier/LieuUploadForm";
+import LieuGrid from "../components/atelier/LieuGrid";
 import Toaster from "../components/atelier/Toaster";
 
 const NAV_ITEMS = [
     { id: "overview", icon: "grid", label: "Vue d'ensemble" },
     { id: "illustration", icon: "image", label: "Illustrations" },
     { id: "crochet", icon: "aperture", label: "Crochet" },
+    { id: "boutique", icon: "store", label: "Boutique" },
     { id: "add", icon: "plus", label: "Ajouter une œuvre" },
 ];
 
@@ -24,6 +30,7 @@ const SECTION_TITLE = {
     overview: "Vue d'ensemble",
     illustration: "Illustrations",
     crochet: "Crochet",
+    boutique: "Boutique",
     add: "Ajouter une œuvre",
 };
 
@@ -49,8 +56,19 @@ export default function Atelier() {
         removeOeuvre,
         reorderOeuvres,
     } = useOeuvres();
+    const { boutique, updateBoutique } = useBoutiqueInfo();
+    const {
+        lieux,
+        loading: lieuxLoading,
+        addLieu,
+        stashLieu,
+        restoreLieu,
+        removeLieu,
+        reorderLieux,
+    } = useLieux();
     const { toasts, push, dismiss } = useToasts();
-    const pendingDeletes = useRef(new Map()); // id -> timeoutId
+    const pendingDeletes = useRef(new Map()); // id -> timeoutId (œuvres)
+    const pendingDeletesLieux = useRef(new Map()); // id -> timeoutId (lieux)
 
     const [section, setSection] = useState("overview");
     const [isNarrow, setIsNarrow] = useState(
@@ -132,11 +150,69 @@ export default function Atelier() {
     // en attente : l'œuvre réapparaîtra au prochain chargement (choix prudent).
     useEffect(() => {
         const map = pendingDeletes.current;
-        return () => map.forEach(clearTimeout);
+        const mapLieux = pendingDeletesLieux.current;
+        return () => {
+            map.forEach(clearTimeout);
+            mapLieux.forEach(clearTimeout);
+        };
     }, []);
 
     const handleReorder = async (orderedIds) => {
         const { error } = await reorderOeuvres(orderedIds);
+        if (error) push(`Erreur : ${error.message}`, "error");
+    };
+
+    const handleSaveBoutique = async (patch, file) => {
+        const { error } = await updateBoutique(patch, file);
+        push(error ? `Erreur : ${error.message}` : "Fiche boutique enregistrée.", error ? "error" : "success");
+        return !error;
+    };
+
+    // Même principe que handleAddBatch mais sans titre/catégorie : `failed`
+    // contient directement les fichiers en échec.
+    const handleAddLieux = async (files, onProgress) => {
+        const failed = [];
+        for (let i = 0; i < files.length; i += 1) {
+            const { error } = await addLieu(files[i]);
+            if (error) failed.push(files[i]);
+            onProgress?.(i + 1, files.length);
+        }
+        const published = files.length - failed.length;
+        if (published > 0) {
+            push(`${published} photo${published > 1 ? "s" : ""} publiée${published > 1 ? "s" : ""}.`, "success");
+        }
+        if (failed.length > 0) push(`${failed.length} photo(s) en échec.`, "error");
+        return { failed };
+    };
+
+    // Même logique d'annulation que handleDelete, sur la liste des lieux.
+    const handleDeleteLieu = (id, imgUrl) => {
+        const item = stashLieu(id);
+        if (!item) return;
+        const timer = setTimeout(async () => {
+            pendingDeletesLieux.current.delete(id);
+            const { error } = await removeLieu(id, imgUrl);
+            if (error) {
+                restoreLieu(item);
+                push(`Erreur : ${error.message}`, "error");
+            }
+        }, 6000);
+        pendingDeletesLieux.current.set(id, timer);
+        push("Photo retirée.", "info", {
+            duration: 6000,
+            action: {
+                label: "Annuler",
+                onClick: () => {
+                    clearTimeout(timer);
+                    pendingDeletesLieux.current.delete(id);
+                    restoreLieu(item);
+                },
+            },
+        });
+    };
+
+    const handleReorderLieux = async (orderedIds) => {
+        const { error } = await reorderLieux(orderedIds);
         if (error) push(`Erreur : ${error.message}`, "error");
     };
 
@@ -193,7 +269,7 @@ export default function Atelier() {
                         <h1 style={{ fontFamily: "Georgia, serif", fontSize: "1.7rem", fontWeight: 400, color: COLORS.ink, margin: 0 }}>
                             {SECTION_TITLE[section]}
                         </h1>
-                        {section !== "add" && (
+                        {section !== "add" && section !== "boutique" && (
                             <button onClick={() => setSection("add")} style={btnPrimary}>
                                 <Icon name="plus" size={15} />
                                 Ajouter une œuvre
@@ -211,6 +287,36 @@ export default function Atelier() {
 
                     {section === "add" ? (
                         <UploadForm onSubmit={handleAddBatch} onCancel={() => setSection("overview")} />
+                    ) : section === "boutique" ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+                            <div>
+                                <h2 style={{ fontFamily: "Georgia, serif", fontSize: "1.2rem", fontWeight: 400, color: COLORS.ink, margin: "0 0 4px" }}>
+                                    Vitrine
+                                </h2>
+                                <p style={{ fontSize: 13, color: COLORS.muted, margin: "0 0 16px" }}>
+                                    La fiche affichée sur le site (photo, nom, adresse, horaires).
+                                </p>
+                                <BoutiqueForm boutique={boutique} onSave={handleSaveBoutique} />
+                            </div>
+
+                            <div>
+                                <h2 style={{ fontFamily: "Georgia, serif", fontSize: "1.2rem", fontWeight: 400, color: COLORS.ink, margin: "0 0 4px" }}>
+                                    Lieux ponctuels
+                                </h2>
+                                <p style={{ fontSize: 13, color: COLORS.muted, margin: "0 0 16px" }}>
+                                    Les photos du carrousel « où me trouver ponctuellement ». Glisse une
+                                    photo par sa poignée pour changer l'ordre.
+                                </p>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 560, marginBottom: 20 }}>
+                                    <LieuUploadForm onSubmit={handleAddLieux} />
+                                </div>
+                                {lieuxLoading ? (
+                                    <p style={{ color: COLORS.muted, fontSize: 14 }}>Chargement…</p>
+                                ) : (
+                                    <LieuGrid lieux={lieux} onDelete={handleDeleteLieu} onReorder={handleReorderLieux} />
+                                )}
+                            </div>
+                        </div>
                     ) : (
                         <>
                             <Toolbar

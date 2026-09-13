@@ -1,15 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { compressImage } from "../lib/compressImage";
+import { uploadToGalerie, removeFromGalerie, fileNameFromUrl } from "../lib/galerieStorage";
 
 const TABLE = "oeuvres";
-const BUCKET = "galerie";
 
 // Code Postgres pour « colonne inexistante » : la colonne `position` peut ne
 // pas encore avoir été ajoutée (migration SQL optionnelle).
 const UNDEFINED_COLUMN = "42703";
-
-const fileNameFromUrl = (url) => (url ? url.split("/").pop() : null);
 
 // Tri stable par `position` ; les lignes sans position gardent l'ordre reçu
 // (donc `created_at` décroissant venant de la requête).
@@ -19,19 +16,6 @@ const sortByPosition = (list) =>
         const pb = b.position ?? Number.POSITIVE_INFINITY;
         return pa - pb;
     });
-
-// Téléverse un fichier (après compression) et renvoie son URL publique.
-async function uploadImage(file) {
-    const optimised = await compressImage(file);
-    const ext = optimised.name.split(".").pop();
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-    const { error } = await supabase.storage.from(BUCKET).upload(path, optimised);
-    if (error) return { error };
-
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-    return { url: data.publicUrl };
-}
 
 // Couche données du back-office : centralise tous les appels Supabase.
 // Les composants ne touchent jamais `supabase` directement.
@@ -62,7 +46,7 @@ export function useOeuvres() {
     const addOeuvre = async ({ title, category, size, file }) => {
         if (!supabase) return { error: new Error("Supabase non configuré.") };
 
-        const up = await uploadImage(file);
+        const up = await uploadToGalerie(file);
         if (up.error) return { error: up.error };
 
         // Nouvelle œuvre = à la fin de sa catégorie.
@@ -93,7 +77,7 @@ export function useOeuvres() {
         let nextPatch = patch;
 
         if (file) {
-            const up = await uploadImage(file);
+            const up = await uploadToGalerie(file);
             if (up.error) return { error: up.error };
             nextPatch = { ...patch, img_url: up.url };
         }
@@ -102,10 +86,7 @@ export function useOeuvres() {
         if (error) return { error };
 
         // Ancien fichier supprimé seulement une fois la ligne mise à jour.
-        if (file && current?.img_url) {
-            const stale = fileNameFromUrl(current.img_url);
-            if (stale) supabase.storage.from(BUCKET).remove([stale]);
-        }
+        if (file && current?.img_url) removeFromGalerie(current.img_url);
 
         setOeuvres((list) => list.map((it) => (it.id === id ? { ...it, ...nextPatch } : it)));
         return {};
@@ -130,11 +111,7 @@ export function useOeuvres() {
     const removeOeuvre = async (id, imgUrl) => {
         if (!supabase) return { error: new Error("Supabase non configuré.") };
 
-        const stale = fileNameFromUrl(imgUrl);
-        if (stale) {
-            const del = await supabase.storage.from(BUCKET).remove([stale]);
-            if (del.error) console.warn("Fichier Storage introuvable :", del.error.message);
-        }
+        if (fileNameFromUrl(imgUrl)) await removeFromGalerie(imgUrl);
 
         const { error } = await supabase.from(TABLE).delete().eq("id", id);
         if (error) return { error };

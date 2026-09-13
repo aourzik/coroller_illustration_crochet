@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { useBreakpoint } from "./hooks/useBreakpoint";
+import { useBoutiqueInfo } from "./hooks/useBoutiqueInfo";
+import { useLieux } from "./hooks/useLieux";
 
 // --- IMPORTS ASSETS ---
 import mariePhoto from "./assets/images/marie.jpg";
@@ -94,29 +96,37 @@ function AnimatedCounter({ target, duration = 2000 }) {
     return <span ref={countRef}>{count}{target.includes('+') ? '+' : ''}</span>;
 }
 
-function Carousel({ items, dark }) {
+function Carousel({ items, dark, interval = 4000, imageHeight = "clamp(300px, 56vw, 500px)", outerHeight }) {
     const [cur, setCur] = useState(0);
     const n = items.length;
 
     useEffect(() => {
-        const timer = setInterval(() => setCur(c => (c + 1) % n), 4000);
+        const timer = setInterval(() => setCur(c => (c + 1) % n), interval);
         return () => clearInterval(timer);
-    }, [n]);
+    }, [n, interval]);
 
     const prev = () => setCur(i => (i - 1 + n) % n);
     const next = () => setCur(i => (i + 1) % n);
 
+    // outerHeight (optionnel) : le carrousel prend une hauteur totale fixe et
+    // la zone d'image se répartit tout ce qui reste sous la rangée de
+    // contrôles (utile pour caler sa hauteur sur une colonne voisine).
     return (
-        <div style={{ width: "100%", userSelect: "none" }}>
-            <div style={{ position: "relative", height: "clamp(300px, 56vw, 500px)", overflow: "hidden", borderRadius: 24 }}>
+        <div style={{ width: "100%", userSelect: "none", height: outerHeight || "auto", display: "flex", flexDirection: "column" }}>
+            <div style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: 24,
+                ...(outerHeight ? { flex: "1 1 auto", minHeight: 0 } : { flex: "0 0 auto", height: imageHeight }),
+            }}>
                 {items.map((item, i) => {
                     const offset = ((i - cur + n) % n);
                     const pos = offset <= n / 2 ? offset : offset - n;
                     const visible = Math.abs(pos) <= 1;
                     return (
-                        <div key={item.label} style={{
+                        <div key={item.id ?? item.label ?? i} style={{
                             position: "absolute", inset: 0,
-                            background: item.bg,
+                            background: item.bg || "#1a1030",
                             borderRadius: 24,
                             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                             transform: `translateX(${pos * 105}%) scale(${pos === 0 ? 1 : 0.88})`,
@@ -128,21 +138,21 @@ function Carousel({ items, dark }) {
                             <div style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}>
                                 <img
                                     src={item.img}
-                                    alt={item.label}
+                                    alt={item.label || ""}
                                     style={{
                                         width: "100%",
                                         height: "100%",
                                         objectFit: "cover",
-                                        opacity: 0.6,
+                                        opacity: item.label ? 0.6 : 1,
                                     }}
                                 />
                             </div>
-                            <div style={{ color: "#fff", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 400, zIndex: 1 }}>{item.label}</div>
+                            {item.label && <div style={{ color: "#fff", fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 400, zIndex: 1 }}>{item.label}</div>}
                         </div>
                     );
                 })}
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 20, flexShrink: 0 }}>
                 <button onClick={prev} style={{ background: "none", border: `1px solid ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`, borderRadius: 99, width: 44, height: 44, cursor: "pointer", color: dark ? "#fff" : C.ink, fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>←</button>
                 <div style={{ display: "flex", gap: 8 }}>
                     {items.map((_, i) => (
@@ -161,6 +171,8 @@ export default function App() {
     const [scrolled, setScrolled] = useState(false);
     const { pathname } = useLocation();
     const { isMobile, isTablet } = useBreakpoint();
+    const { boutique } = useBoutiqueInfo();
+    const { lieux } = useLieux();
 
     // Les routes "back-office" (login + atelier) s'affichent sans le Nav/Footer
     // ni les bulles d'ambiance du site public.
@@ -178,6 +190,10 @@ export default function App() {
         position: "relative",
         zIndex: 2,
     };
+
+    // Hauteur commune des deux colonnes de la section boutique, pour que
+    // tout tienne sur un seul écran (100vh) sur desktop/tablette.
+    const boutiqueColHeight = "clamp(380px, 54vh, 560px)";
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -334,6 +350,154 @@ export default function App() {
                                 </div>
                             </div>
                         </section>
+
+                        {/* BOUTIQUE — n'apparaît que si Marie a rempli sa fiche dans l'Atelier.
+                            Tient sur un seul écran (100vh) : photo → titre → description → carte
+                            à gauche, carrousel des lieux ponctuels à droite. */}
+                        {boutique?.nom && (
+                            <section
+                                id="boutique"
+                                style={{
+                                    minHeight: isTablet ? "auto" : "100vh",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    maxWidth: 1600,
+                                    margin: "0 auto",
+                                    padding: isMobile ? "56px 20px" : "60px 40px",
+                                    position: "relative",
+                                    zIndex: 2,
+                                }}
+                            >
+                                <div style={{ width: "100%" }}>
+                                    <Tag label="Retrouvez mes créations" />
+                                    <div
+                                        style={{
+                                            display: "grid",
+                                            gridTemplateColumns: isTablet ? "1fr" : "1fr 1fr",
+                                            gap: isTablet ? 28 : 60,
+                                            marginTop: 16,
+                                        }}
+                                    >
+                                        {/* GAUCHE : (photo + description côte à côte) → titre → carte */}
+                                        <div
+                                            style={{
+                                                height: isTablet ? "auto" : boutiqueColHeight,
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 14,
+                                                minHeight: 0,
+                                                overflow: "hidden",
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    flex: "0 0 auto",
+                                                    display: "flex",
+                                                    flexDirection: isTablet ? "column" : "row",
+                                                    gap: 16,
+                                                    alignItems: isTablet ? "stretch" : "flex-start",
+                                                }}
+                                            >
+                                                {boutique.img_url && (
+                                                    <img
+                                                        src={boutique.img_url}
+                                                        alt={boutique.nom}
+                                                        style={{
+                                                            width: isTablet ? "100%" : "42%",
+                                                            flexShrink: 0,
+                                                            height: isTablet ? "clamp(160px, 38vw, 220px)" : "clamp(150px, 21vh, 200px)",
+                                                            objectFit: "cover",
+                                                            borderRadius: 18,
+                                                            border: `1px solid ${cardBorder}`,
+                                                        }}
+                                                    />
+                                                )}
+                                                {/* Titre + description + horaires, ensemble à côté de la photo */}
+                                                <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                                                    <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(1.6rem,2.6vw,2.1rem)", fontWeight: 400, lineHeight: 1.2, margin: 0, color: txt }}>
+                                                        {boutique.nom}
+                                                    </h2>
+                                                    {boutique.description && (
+                                                        <p
+                                                            style={{
+                                                                color: muted,
+                                                                lineHeight: 1.6,
+                                                                fontSize: 15,
+                                                                margin: 0,
+                                                                overflow: "hidden",
+                                                                display: "-webkit-box",
+                                                                WebkitLineClamp: isTablet ? 3 : 5,
+                                                                WebkitBoxOrient: "vertical",
+                                                            }}
+                                                        >
+                                                            {boutique.description}
+                                                        </p>
+                                                    )}
+                                                    {boutique.horaires && (
+                                                        <p style={{ color: muted, fontSize: 13.5, margin: "10px 0 0" }}>{boutique.horaires}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {boutique.adresse && (
+                                                <div
+                                                    style={{
+                                                        flex: "1 1 auto",
+                                                        minHeight: isTablet ? 160 : 0,
+                                                        borderRadius: 14,
+                                                        overflow: "hidden",
+                                                        border: `1px solid ${cardBorder}`,
+                                                    }}
+                                                >
+                                                    <iframe
+                                                        title="Localisation de la boutique"
+                                                        src={`https://www.google.com/maps?q=${encodeURIComponent(boutique.adresse)}&output=embed`}
+                                                        width="100%"
+                                                        height="100%"
+                                                        style={{ border: 0, display: "block" }}
+                                                        loading="lazy"
+                                                    />
+                                                </div>
+                                            )}
+                                            {boutique.adresse && (
+                                                <a
+                                                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(boutique.adresse)}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    style={{ flex: "0 0 auto", fontSize: 13, fontWeight: 700, color: C.accent, textDecoration: "none" }}
+                                                >
+                                                    Voir l'itinéraire →
+                                                </a>
+                                            )}
+                                        </div>
+
+                                        {/* DROITE : sous-titre + carrousel des lieux ponctuels, calé sur
+                                            la même hauteur totale que la colonne de gauche */}
+                                        {lieux.length > 0 && (
+                                            <div
+                                                style={{
+                                                    height: isTablet ? "auto" : boutiqueColHeight,
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    gap: 12,
+                                                    minHeight: 0,
+                                                }}
+                                            >
+                                                <Tag label="Me retrouver ponctuellement" />
+                                                <div style={{ flex: isTablet ? "0 0 auto" : "1 1 auto", minHeight: 0 }}>
+                                                    <Carousel
+                                                        items={lieux.map((l) => ({ id: l.id, img: l.img_url, bg: dark ? "#1a1030" : "#d5e4f9" }))}
+                                                        dark={dark}
+                                                        interval={7000}
+                                                        outerHeight={isTablet ? undefined : "100%"}
+                                                        imageHeight={isTablet ? "clamp(240px, 60vw, 400px)" : undefined}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+                        )}
 
                         {/* ILLUSTRATIONS */}
                         <section id="illustrations" className="reveal" style={twoColSection}>
