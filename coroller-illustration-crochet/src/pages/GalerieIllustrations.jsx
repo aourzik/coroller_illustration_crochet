@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react"; // 👈 Intégration de useState et useEffect
 import { Link } from "react-router-dom";
-import { C } from "../App"; 
+import { C } from "../App";
 import { supabase } from "../supabaseClient"; // 👈 Connexion au client Supabase
+import Lightbox from "../components/Lightbox";
 
 export default function GalerieIllustrations({ dark }) {
     // Liste dynamique des illustrations chargées depuis Supabase
     const [allIllus, setAllIllus] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [openIndex, setOpenIndex] = useState(null); // œuvre ouverte en grand, ou null
 
     useEffect(() => {
         async function fetchIllustrations() {
@@ -151,28 +153,32 @@ export default function GalerieIllustrations({ dark }) {
                         gap: 24, 
                         gridAutoFlow: "dense" 
                     }}>
-                        {allIllus.map((item) => (
-                            <div key={item.id} style={{ 
-                                gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`, 
-                                position: "relative", 
-                                borderRadius: 24, 
-                                overflow: "hidden", 
+                        {allIllus.map((item, i) => (
+                            <div key={item.id}
+                                onClick={() => setOpenIndex(i)}
+                                style={{
+                                gridRowEnd: `span ${item.size === 'large' ? 3 : 2}`,
+                                position: "relative",
+                                borderRadius: 24,
+                                overflow: "hidden",
                                 background: dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
-                                border: `1px solid ${cardBorder}` 
+                                border: `1px solid ${cardBorder}`,
+                                cursor: "pointer",
                             }}>
                                 <img src={item.img_url} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                                
-                                <div style={{ 
-                                    position: "absolute", inset: 0, 
-                                    background: "rgba(13, 11, 26, 0.7)", opacity: 0, 
+
+                                <div style={{
+                                    position: "absolute", inset: 0,
+                                    background: "rgba(13, 11, 26, 0.7)", opacity: 0,
                                     display: "flex", flexDirection: "column", gap: "12px",
-                                    alignItems: "center", justifyContent: "center", 
+                                    alignItems: "center", justifyContent: "center",
                                     transition: "0.3s", backdropFilter: "blur(4px)"
-                                }} 
-                                onMouseEnter={e => e.currentTarget.style.opacity = 1} 
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.opacity = 1}
                                 onMouseLeave={e => e.currentTarget.style.opacity = 0}>
                                     <span style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: "1.2rem" }}>{item.title}</span>
-                                    <Link to="/contact">
+                                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "12px", letterSpacing: 0.5, textTransform: "uppercase" }}>Cliquer pour agrandir</span>
+                                    <Link to="/contact" onClick={e => e.stopPropagation()}>
                                         <button style={{ background: "#fd6a3d", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 600 }}>Commander ?</button>
                                     </Link>
                                 </div>
@@ -181,6 +187,16 @@ export default function GalerieIllustrations({ dark }) {
                     </div>
                 )}
             </div>
+
+            {openIndex !== null && (
+                <Lightbox
+                    items={allIllus}
+                    index={openIndex}
+                    onClose={() => setOpenIndex(null)}
+                    onPrev={() => setOpenIndex((i) => (i - 1 + allIllus.length) % allIllus.length)}
+                    onNext={() => setOpenIndex((i) => (i + 1) % allIllus.length)}
+                />
+            )}
         </div>
     );
 }
