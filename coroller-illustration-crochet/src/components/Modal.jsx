@@ -13,12 +13,11 @@ export default function Modal({ onClose, dark }) {
         e.preventDefault();
         setStatus("Envoi en cours...");
 
-        // REMPLACE LES CODES CI-DESSOUS PAR TES CODES EMAILJS
         emailjs.sendForm(
-            'service_lhhkv9f',
-            'template_jxcsqn5',
+            'service_xrhber8',
+            'template_19hzzrx',
             form.current,
-            'DSJIeivHNjwwa9u8v'
+            'ZKc1O0Td1tNlX86lY'
         )
             .then(() => {
                 setStatus("Message envoyé ! ✨");
